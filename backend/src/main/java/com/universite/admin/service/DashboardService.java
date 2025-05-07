@@ -29,8 +29,8 @@ public class DashboardService {
         long totalProfessors = userRepository.countByRole(UserRole.PROFESSOR);
         long totalAdmins = userRepository.countByRole(UserRole.ADMIN);
 
-        long activeStudents = userRepository.countByRoleAndStatus(UserRole.STUDENT, StudentStatus.ACTIF);
-        long suspendedStudents = userRepository.countByRoleAndStatus(UserRole.STUDENT, StudentStatus.SUSPENDU);
+        long activeStudents = userRepository.countByRoleAndStatut(UserRole.STUDENT, StudentStatus.ACTIF);
+        long suspendedStudents = userRepository.countByRoleAndStatut(UserRole.STUDENT, StudentStatus.SUSPENDU);
 
         long totalFilieres = filiereRepository.count();
         long totalModules = moduleRepository.count();

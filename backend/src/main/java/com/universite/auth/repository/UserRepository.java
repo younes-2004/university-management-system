@@ -25,5 +25,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Méthodes de comptage pour le dashboard
     long countByRole(UserRole role);
 
-    long countByRoleAndStatus(UserRole role, StudentStatus status);
+    long countByRoleAndStatut(UserRole role, StudentStatus statut);
 }
