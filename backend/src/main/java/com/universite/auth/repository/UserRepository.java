@@ -1,6 +1,7 @@
 package com.universite.auth.repository;
 
 import com.universite.auth.entity.User;
+import com.universite.auth.entity.enums.StudentStatus;
 import com.universite.auth.entity.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,5 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsBynApogee(String nApogee);
 
     List<User> findByRole(UserRole role);
+
     Optional<User> findBynApogee(String nApogee);
+
+    // Méthodes de comptage pour le dashboard
+    long countByRole(UserRole role);
+
+    long countByRoleAndStatus(UserRole role, StudentStatus status);
 }
