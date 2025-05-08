@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class ModuleService {
     public List<ModuleDto> getAllModules() {
         return moduleRepository.findAll().stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +51,7 @@ public class ModuleService {
 
         return moduleRepository.findByFiliere(filiere).stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +65,7 @@ public class ModuleService {
 
         return moduleRepository.findByProfesseur(professeur).stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +75,7 @@ public class ModuleService {
 
         return moduleRepository.findByFiliereAndSemestre(filiere, semestre).stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -138,7 +138,22 @@ public class ModuleService {
         Module updatedModule = moduleRepository.save(module);
         return mapToDto(updatedModule);
     }
+    // À ajouter dans ModuleService.java
+    @Transactional
+    public void assignProfessorToModule(Long moduleId, Long professorId) {
+        Module module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new ResourceNotFoundException(MODULE_NOT_FOUND + moduleId));
 
+        User professor = userRepository.findById(professorId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROFESSEUR_NOT_FOUND + professorId));
+
+        if (professor.getRole() != UserRole.PROFESSOR) {
+            throw new BadRequestException(USER_IS_NOT_A_PROFESSOR);
+        }
+
+        module.setProfesseur(professor);
+        moduleRepository.save(module);
+    }
     @Transactional
     public void deleteModule(Long id) {
         Module module = moduleRepository.findById(id)

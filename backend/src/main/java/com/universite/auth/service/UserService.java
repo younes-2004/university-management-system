@@ -6,11 +6,13 @@ import com.universite.auth.entity.enums.UserRole;
 import com.universite.auth.exception.BadRequestException;
 import com.universite.auth.exception.ResourceNotFoundException;
 import com.universite.auth.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 
 @Service
@@ -27,7 +29,16 @@ public class UserService {
 
         return mapToDto(user);
     }
-
+    // À ajouter dans UserService.java
+    @Transactional(readOnly = true)
+    public List<UserDto> getStudentsByFiliere(Long filiereId) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getRole() == UserRole.STUDENT &&
+                        user.getFiliereId() != null &&
+                        user.getFiliereId().equals(filiereId))
+                .map(this::mapToDto)
+                .toList();  // Méthode moderne (Java 16+)
+    }
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + email));
