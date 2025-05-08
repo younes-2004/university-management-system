@@ -27,25 +27,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String token = getTokenFromRequest(request);
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
 
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            String username = tokenProvider.getUsernameFromToken(token);
+        System.out.println("========== JWT FILTER ==========");
+        System.out.println("JwtAuthenticationFilter - Request: " + method + " " + requestURI);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
-
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        // Pour les endpoints d'authentification, on passe directement sans vérifier le token
+        if (requestURI.contains("/api/auth/login") || requestURI.contains("/api/auth/register")) {
+            System.out.println("JwtAuthenticationFilter - Bypassing filter for auth endpoint: " + requestURI);
+            filterChain.doFilter(request, response);
+            System.out.println("========== JWT FILTER END ==========");
+            return;
         }
 
+        String token = getTokenFromRequest(request);
+        System.out.println("JwtAuthenticationFilter - Token présent: " + (StringUtils.hasText(token) ? "Oui" : "Non"));
+
+        if (StringUtils.hasText(token)) {
+            try {
+                if (tokenProvider.validateToken(token)) {
+                    String username = tokenProvider.getUsernameFromToken(token);
+                    System.out.println("JwtAuthenticationFilter - Token valide pour l'utilisateur: " + username);
+
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    System.out.println("JwtAuthenticationFilter - Authentification définie dans SecurityContext");
+                } else {
+                    System.out.println("JwtAuthenticationFilter - Token invalide");
+                }
+            } catch (Exception e) {
+                System.err.println("JwtAuthenticationFilter - Erreur lors de la validation du token: " + e.getMessage());
+            }
+        } else {
+            System.out.println("JwtAuthenticationFilter - Pas de token JWT dans la requête");
+        }
+
+        System.out.println("JwtAuthenticationFilter - Passage à la suite de la chaîne de filtres");
         filterChain.doFilter(request, response);
+        System.out.println("========== JWT FILTER END ==========");
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
