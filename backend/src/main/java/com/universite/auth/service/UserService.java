@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +38,9 @@ public class UserService {
         return userRepository.findByRole(role)
                 .stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();  // Directly returning the result
     }
+
 
     public UserDto createUser(UserDto userDto, String rawPassword) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
