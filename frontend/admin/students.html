@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Étudiants - Administrateur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/custom.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Système Universitaire</h1>
+            <div class="flex items-center space-x-4">
+                <span id="user-info">Chargement...</span>
+                <button onclick="logout()" class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded">
+                    Déconnexion
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex flex-wrap space-x-1 md:space-x-4">
+                <a href="dashboard.html" class="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded font-medium mb-2">Tableau de bord</a>
+                <a href="filieres.html" class="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded font-medium mb-2">Filières</a>
+                <a href="professors.html" class="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded font-medium mb-2">Professeurs</a>
+                <a href="students.html" class="bg-blue-100 text-blue-700 px-3 py-2 rounded font-medium mb-2">Étudiants</a>
+                <a href="card-requests.html" class="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded font-medium mb-2">Demandes de cartes</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- En-tête avec sélection de filière et boutons d'action -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-3 md:mb-0">Gestion des Étudiants</h2>
+            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                <div class="relative">
+                    <select id="filiere-select" onchange="filterStudentsByFiliere()" 
+                            class="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Toutes les filières</option>
+                        <!-- Les options seront remplies dynamiquement -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="showAddStudentForm()" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Ajouter
+                    </button>
+                    <button onclick="showImportForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Importer Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulaire d'ajout/modification (caché par défaut) -->
+        <div id="student-form" class="bg-white rounded-lg shadow p-6 mb-6 hidden">
+            <h3 id="form-title" class="text-xl font-semibold text-gray-800 mb-4">Ajouter un étudiant</h3>
+            <form id="student-form-element" onsubmit="submitStudentForm(event)">
+                <input type="hidden" id="student-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="student-nom" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="student-nom" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="student-prenom" class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                        <input type="text" id="student-prenom" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="student-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="student-email" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="student-date-naissance" class="block text-sm font-medium text-gray-700 mb-1">Date de naissance</label>
+                        <input type="date" id="student-date-naissance" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="student-napogee" class="block text-sm font-medium text-gray-700 mb-1">Numéro Apogée</label>
+                        <input type="text" id="student-napogee" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="student-filiere" class="block text-sm font-medium text-gray-700 mb-1">Filière</label>
+                        <select id="student-filiere" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Sélectionner une filière</option>
+                            <!-- Les options seront remplies dynamiquement -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="student-annee" class="block text-sm font-medium text-gray-700 mb-1">Année</label>
+                        <select id="student-annee" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Sélectionner une année</option>
+                            <option value="PREMIERE_ANNEE">1ère année</option>
+                            <option value="DEUXIEME_ANNEE">2ème année</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="student-statut" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                        <select id="student-statut" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Sélectionner un statut</option>
+                            <option value="ACTIF">Actif</option>
+                            <option value="SUSPENDU">Suspendu</option>
+                            <option value="ARRETE">Arrêté</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="password-section" class="mb-4">
+                    <label for="student-password" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                    <input type="password" id="student-password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Minimum 4 caractères. Ce mot de passe sera utilisé pour la première connexion.</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideStudentForm()" 
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Formulaire d'importation Excel (caché par défaut) -->
+        <div id="import-form" class="bg-white rounded-lg shadow p-6 mb-6 hidden">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Importer des étudiants depuis Excel</h3>
+            <form id="import-form-element" onsubmit="submitImportForm(event)">
+                <div class="mb-4">
+                    <label for="import-filiere" class="block text-sm font-medium text-gray-700 mb-1">Filière</label>
+                    <select id="import-filiere" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Sélectionner une filière</option>
+                        <!-- Les options seront remplies dynamiquement -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="import-file" class="block text-sm font-medium text-gray-700 mb-1">Fichier Excel</label>
+                    <input type="file" id="import-file" accept=".xlsx,.xls" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Format attendu: Numéro Apogée, Nom, Prénom, Email, Date de naissance (jj/mm/aaaa), Année (1 ou 2)</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideImportForm()" 
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded">
+                        Importer
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Liste des étudiants -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Apogée</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom complet</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filière</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Année</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">Chargement des étudiants...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de confirmation de suppression -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-auto">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirmation de suppression</h3>
+            <p class="text-gray-600 mb-4">Êtes-vous sûr de vouloir supprimer cet étudiant ? Cette action est irréversible.</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="hideDeleteModal()"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                    Annuler
+                </button>
+                <button id="confirm-delete-btn" 
+                        class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
+                    Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/common.js"></script>
+    <script>
+        let currentStudentId = null;
+        let allFilieres = [];
+        let currentFiliere = '';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si l'utilisateur est authentifié
+            const user = checkAuth();
+            if (!user) return;
+            
+            // Vérifier si l'utilisateur est bien un administrateur
+            if (user.role !== 'ADMIN') {
+                logout();
+                return;
+            }
+            
+            // Afficher les informations de l'utilisateur
+            document.getElementById('user-info').textContent = `${user.prenom} ${user.nom}`;
+            
+            // Charger les filières pour le filtre et les formulaires
+            loadFilieres();
+            
+            // Charger la liste des étudiants
+            loadStudents();
+        });
+        
+        // Charger les filières
+        async function loadFilieres() {
+            try {
+                allFilieres = await apiGet('http://localhost:8080/api/filieres');
+                
+                // Remplir les sélecteurs de filière
+                const filiereSelectFilter = document.getElementById('filiere-select');
+                const filiereSelectForm = document.getElementById('student-filiere');
+                const filiereSelectImport = document.getElementById('import-filiere');
+                
+                if (allFilieres && allFilieres.length > 0) {
+                    const options = allFilieres.map(filiere => `
+                        <option value="${filiere.id}">${filiere.nom}</option>
+                    `).join('');
+                    
+                    filiereSelectFilter.innerHTML = `<option value="">Toutes les filières</option>${options}`;
+                    filiereSelectForm.innerHTML = `<option value="">Sélectionner une filière</option>${options}`;
+                    filiereSelectImport.innerHTML = `<option value="">Sélectionner une filière</option>${options}`;
+                } else {
+                    filiereSelectFilter.innerHTML = `<option value="">Aucune filière disponible</option>`;
+                    filiereSelectForm.innerHTML = `<option value="">Aucune filière disponible</option>`;
+                    filiereSelectImport.innerHTML = `<option value="">Aucune filière disponible</option>`;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des filières:', error);
+                showNotification('Erreur lors du chargement des filières', 'error');
+            }
+        }
+        
+        // Charger la liste des étudiants
+        async function loadStudents() {
+            try {
+                let url = 'http://localhost:8080/api/admin/students';
+                if (currentFiliere) {
+                    url = `http://localhost:8080/api/admin/filieres/${currentFiliere}/students`;
+                }
+                
+                const data = await apiGet(url);
+                const tbody = document.getElementById('students-table-body');
+                
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map(student => {
+                        // Trouver le nom de la filière
+                        const filiere = allFilieres.find(f => f.id === student.filiereId);
+                        const filiereName = filiere ? filiere.nom : 'Non assignée';
+                        
+                        // Formater l'année
+                        let annee = '';
+                        if (student.annee === 'PREMIERE_ANNEE') annee = '1ère année';
+                        else if (student.annee === 'DEUXIEME_ANNEE') annee = '2ème année';
+                        
+                        // Formatter le statut
+                        let statut = '';
+                        if (student.statut === 'ACTIF') statut = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Actif</span>';
+                        else if (student.statut === 'SUSPENDU') statut = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Suspendu</span>';
+                        else if (student.statut === 'ARRETE') statut = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">Arrêté</span>';
+                        
+                        return `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">${student.nApogee || '-'}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">${student.prenom} ${student.nom}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500">${student.email}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">${filiereName}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">${annee}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div>${statut}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex space-x-2">
+                                        <button onclick="editStudent(${student.id})" class="text-blue-600 hover:text-blue-900">Modifier</button>
+                                        <button onclick="showDeleteModal(${student.id})" class="text-red-600 hover:text-red-900">Supprimer</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">Aucun étudiant trouvé</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des étudiants:', error);
+                document.getElementById('students-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-red-500">Erreur lors du chargement des étudiants</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Filtrer les étudiants par filière
+        function filterStudentsByFiliere() {
+            currentFiliere = document.getElementById('filiere-select').value;
+            loadStudents();
+        }
+        
+        // Afficher le formulaire d'ajout d'étudiant
+        function showAddStudentForm() {
+            document.getElementById('form-title').textContent = 'Ajouter un étudiant';
+            document.getElementById('student-id').value = '';
+            document.getElementById('student-nom').value = '';
+            document.getElementById('student-prenom').value = '';
+            document.getElementById('student-email').value = '';
+            document.getElementById('student-date-naissance').value = '';
+            document.getElementById('student-napogee').value = '';
+            document.getElementById('student-filiere').value = '';
+            document.getElementById('student-annee').value = '';
+            document.getElementById('student-statut').value = '';
+            document.getElementById('student-password').value = '';
+            document.getElementById('password-section').classList.remove('hidden');
+            document.getElementById('student-form').classList.remove('hidden');
+            
+            // Pré-remplir la filière si on est en train de filtrer par filière
+            if (currentFiliere) {
+                document.getElementById('student-filiere').value = currentFiliere;
+            }
+        }
+        
+        // Cacher le formulaire d'étudiant
+        function hideStudentForm() {
+            document.getElementById('student-form').classList.add('hidden');
+        }
+        
+        // Éditer un étudiant existant
+        async function editStudent(id) {
+            try {
+                const student = await apiGet(`http://localhost:8080/api/admin/students/${id}`);
+                
+                document.getElementById('form-title').textContent = 'Modifier un étudiant';
+                document.getElementById('student-id').value = student.id;
+                document.getElementById('student-nom').value = student.nom;
+                document.getElementById('student-prenom').value = student.prenom;
+                document.getElementById('student-email').value = student.email;
+                document.getElementById('student-napogee').value = student.nApogee;
+                
+                // Formater la date au format YYYY-MM-DD pour l'input type="date"
+                const dateNaissance = new Date(student.dateNaissance);
+                const formattedDate = dateNaissance.toISOString().split('T')[0];
+                document.getElementById('student-date-naissance').value = formattedDate;
+                
+                document.getElementById('student-filiere').value = student.filiereId || '';
+                document.getElementById('student-annee').value = student.annee || '';
+                document.getElementById('student-statut').value = student.statut || '';
+                
+                // Cacher le champ mot de passe en mode édition
+                document.getElementById('password-section').classList.add('hidden');
+                document.getElementById('student-password').required = false;
+                
+                document.getElementById('student-form').classList.remove('hidden');
+                
+                // Faire défiler jusqu'au formulaire
+                document.getElementById('student-form').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'étudiant:', error);
+                showNotification('Erreur lors du chargement de l\'étudiant', 'error');
+            }
+        }
+        
+        // Soumission du formulaire d'étudiant
+        async function submitStudentForm(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('student-id').value;
+            const nom = document.getElementById('student-nom').value;
+            const prenom = document.getElementById('student-prenom').value;
+            const email = document.getElementById('student-email').value;
+            const dateNaissance = document.getElementById('student-date-naissance').value;
+            const nApogee = document.getElementById('student-napogee').value;
+            const filiereId = document.getElementById('student-filiere').value;
+            const annee = document.getElementById('student-annee').value;
+            const statut = document.getElementById('student-statut').value;
+            const password = document.getElementById('student-password').value;
+            
+            const studentData = {
+                nom,
+                prenom,
+                email,
+                dateNaissance,
+                nApogee,
+                filiereId: filiereId ? parseInt(filiereId) : null,
+                annee,
+                statut,
+                role: 'STUDENT'
+            };
+            
+            try {
+                let result;
+                
+                if (id) {
+                    // Mise à jour d'un étudiant existant
+                    studentData.id = parseInt(id);
+                    result = await apiPut(`http://localhost:8080/api/admin/students/${id}`, studentData);
+                    showNotification('Étudiant mis à jour avec succès');
+                } else {
+                    // Création d'un nouvel étudiant
+                    const url = `http://localhost:8080/api/admin/students?password=${encodeURIComponent(password)}`;
+                    result = await apiPost(url, studentData);
+                    showNotification('Étudiant créé avec succès');
+                }
+                
+                // Cacher le formulaire et rafraîchir la liste
+                hideStudentForm();
+                loadStudents();
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde de l\'étudiant:', error);
+                showNotification('Erreur lors de la sauvegarde de l\'étudiant', 'error');
+            }
+        }
+        
+        // Afficher le formulaire d'importation
+        function showImportForm() {
+            document.getElementById('import-file').value = '';
+            
+            // Pré-remplir la filière si on est en train de filtrer par filière
+            if (currentFiliere) {
+                document.getElementById('import-filiere').value = currentFiliere;
+            } else {
+                document.getElementById('import-filiere').value = '';
+            }
+            
+            document.getElementById('import-form').classList.remove('hidden');
+        }
+        
+        // Cacher le formulaire d'importation
+        function hideImportForm() {
+            document.getElementById('import-form').classList.add('hidden');
+        }
+        
+        // Soumettre le formulaire d'importation
+        async function submitImportForm(event) {
+            event.preventDefault();
+            
+            const filiereId = document.getElementById('import-filiere').value;
+            const fileInput = document.getElementById('import-file');
+            
+            if (!filiereId) {
+                showNotification('Veuillez sélectionner une filière', 'error');
+                return;
+            }
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showNotification('Veuillez sélectionner un fichier Excel', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`http://localhost:8080/api/admin/filieres/${filiereId}/students/import`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                hideImportForm();
+                showNotification(result.message || 'Importation réussie');
+                loadStudents();
+            } catch (error) {
+                console.error('Erreur lors de l\'importation des étudiants:', error);
+                showNotification('Erreur lors de l\'importation des étudiants', 'error');
+            }
+        }
+        
+        // Afficher la modal de confirmation de suppression
+        function showDeleteModal(id) {
+            currentStudentId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+            
+            // Configurer le bouton de confirmation
+            document.getElementById('confirm-delete-btn').onclick = function() {
+                deleteStudent(currentStudentId);
+            };
+        }
+        
+        // Cacher la modal de confirmation
+        function hideDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            currentStudentId = null;
+        }
+        
+        // Supprimer un étudiant
+        async function deleteStudent(id) {
+            try {
+                const result = await apiDelete(`http://localhost:8080/api/admin/students/${id}`);
+                hideDeleteModal();
+                showNotification('Étudiant supprimé avec succès');
+                loadStudents();
+            } catch (error) {
+                console.error('Erreur lors de la suppression de l\'étudiant:', error);
+                hideDeleteModal();
+                showNotification('Erreur lors de la suppression de l\'étudiant', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,41 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Test d'importation Excel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion Universitaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/custom.css">
+    <style>
+        .gradient-background {
+            background: linear-gradient(135deg, #3182ce 0%, #63b3ed 100%);
+        }
+    </style>
 </head>
-<body>
-    <h2>Importation d'étudiants</h2>
-    <form id="uploadForm">
-        <input type="file" id="excelFile" accept=".xlsx,.xls" />
-        <button type="submit">Importer</button>
-    </form>
-
-    <div id="result"></div>
-
+<body class="gradient-background min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-600">Système Universitaire</h1>
+            <p class="text-gray-600 mt-2">Gestion des filières, professeurs et étudiants</p>
+        </div>
+        
+        <div class="bg-blue-50 rounded-lg p-6 border border-blue-200 mb-6">
+            <p class="text-gray-700 mb-4">Bienvenue sur la plateforme de gestion universitaire. Veuillez vous connecter pour accéder à votre espace.</p>
+            <div class="flex justify-center">
+                <a href="login.html" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors duration-300">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-500 text-sm">
+            <p>© 2025 Système de Gestion Universitaire</p>
+        </div>
+    </div>
+    
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Rediriger vers la page de connexion si l'utilisateur est déjà connecté
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
             
-            const fileInput = document.getElementById('excelFile');
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            
-            // Récupérer votre token JWT depuis localStorage ou une autre source
-            const token = localStorage.getItem('jwtToken');
-            
-            try {
-                const response = await fetch('http://localhost:8080/api/admin/filieres/1/students/import', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                document.getElementById('result').textContent = `Erreur: ${error.message}`;
+            if (token && user) {
+                // Rediriger vers la page appropriée en fonction du rôle
+                switch (user.role) {
+                    case 'STUDENT':
+                        window.location.href = 'student/dashboard.html';
+                        break;
+                    case 'PROFESSOR':
+                        window.location.href = 'professor/dashboard.html';
+                        break;
+                    case 'ADMIN':
+                        window.location.href = 'admin/dashboard.html';
+                        break;
+                    default:
+                        // En cas de rôle inconnu, effacer les informations de connexion
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        break;
+                }
             }
         });
     </script>
