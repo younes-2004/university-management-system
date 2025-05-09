@@ -2,6 +2,8 @@ package com.universite.academic.entity;
 
 import com.universite.auth.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,9 +25,13 @@ public class Filiere {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Le nom de la filière ne peut pas être vide")
+    @Size(max = 100, message = "Le nom de la filière ne peut pas dépasser 100 caractères")
     @Column(nullable = false, unique = true)
     private String nom;
 
+    @NotBlank(message = "La description de la filière ne peut pas être vide")
+    @Size(max = 500, message = "La description de la filière ne peut pas dépasser 500 caractères")
     @Column(nullable = false)
     private String description;
 

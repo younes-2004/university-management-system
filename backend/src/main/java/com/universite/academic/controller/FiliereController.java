@@ -4,6 +4,7 @@ import com.universite.academic.dto.FiliereDto;
 import com.universite.academic.service.FiliereService;
 import com.universite.auth.dto.ApiResponse;
 import com.universite.auth.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +36,14 @@ public class FiliereController {
 
     @PostMapping("/admin/filieres")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<FiliereDto> createFiliere(@RequestBody FiliereDto filiereDto) {
+    public ResponseEntity<FiliereDto> createFiliere(@Valid @RequestBody FiliereDto filiereDto) {
         FiliereDto createdFiliere = filiereService.createFiliere(filiereDto);
         return new ResponseEntity<>(createdFiliere, HttpStatus.CREATED);
     }
 
     @PutMapping("/admin/filieres/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<FiliereDto> updateFiliere(@PathVariable Long id, @RequestBody FiliereDto filiereDto) {
+    public ResponseEntity<FiliereDto> updateFiliere(@PathVariable Long id, @Valid @RequestBody FiliereDto filiereDto) {
         FiliereDto updatedFiliere = filiereService.updateFiliere(id, filiereDto);
         return ResponseEntity.ok(updatedFiliere);
     }

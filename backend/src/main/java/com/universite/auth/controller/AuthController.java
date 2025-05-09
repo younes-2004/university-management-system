@@ -9,6 +9,7 @@ import com.universite.auth.service.AuthService;
 import com.universite.auth.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,13 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+        if (currentUser == null) {
+            // Retourner une erreur 401 Unauthorized au lieu d'une 500
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(false, "Utilisateur non authentifié"));
+        }
+
         UserDto userDto = userService.getUserById(currentUser.getId());
         return ResponseEntity.ok(userDto);
     }

@@ -5,7 +5,6 @@ import com.universite.academic.entity.Filiere;
 import com.universite.academic.repository.FiliereRepository;
 import com.universite.academic.repository.ModuleRepository;
 import com.universite.auth.entity.User;
-import com.universite.auth.entity.enums.StudentYear;
 import com.universite.auth.entity.enums.UserRole;
 import com.universite.auth.exception.BadRequestException;
 import com.universite.auth.exception.ResourceNotFoundException;
@@ -13,6 +12,7 @@ import com.universite.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,13 +42,23 @@ public class FiliereService {
 
     @Transactional
     public FiliereDto createFiliere(FiliereDto filiereDto) {
+        // Vérification du nom vide
+        if (filiereDto.getNom() == null || filiereDto.getNom().trim().isEmpty()) {
+            throw new BadRequestException("Le nom de la filière ne peut pas être vide");
+        }
+
+        // Vérification de la description vide
+        if (filiereDto.getDescription() == null || filiereDto.getDescription().trim().isEmpty()) {
+            throw new BadRequestException("La description de la filière ne peut pas être vide");
+        }
+
         if (filiereRepository.existsByNom(filiereDto.getNom())) {
             throw new BadRequestException("Une filière avec ce nom existe déjà");
         }
 
         Filiere filiere = Filiere.builder()
-                .nom(filiereDto.getNom())
-                .description(filiereDto.getDescription())
+                .nom(filiereDto.getNom().trim())  // Trim pour éviter les espaces avant/après
+                .description(filiereDto.getDescription().trim())
                 .build();
 
         Filiere savedFiliere = filiereRepository.save(filiere);
@@ -60,14 +70,24 @@ public class FiliereService {
         Filiere filiere = filiereRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(FILIERE_NOT_FOUND + id));
 
+        // Vérification du nom vide
+        if (filiereDto.getNom() == null || filiereDto.getNom().trim().isEmpty()) {
+            throw new BadRequestException("Le nom de la filière ne peut pas être vide");
+        }
+
+        // Vérification de la description vide
+        if (filiereDto.getDescription() == null || filiereDto.getDescription().trim().isEmpty()) {
+            throw new BadRequestException("La description de la filière ne peut pas être vide");
+        }
+
         // Vérification de l'unicité du nom (si modifié)
         if (!filiere.getNom().equals(filiereDto.getNom()) &&
                 filiereRepository.existsByNom(filiereDto.getNom())) {
             throw new BadRequestException("Une filière avec ce nom existe déjà");
         }
 
-        filiere.setNom(filiereDto.getNom());
-        filiere.setDescription(filiereDto.getDescription());
+        filiere.setNom(filiereDto.getNom().trim());
+        filiere.setDescription(filiereDto.getDescription().trim());
 
         Filiere updatedFiliere = filiereRepository.save(filiere);
         return mapToDto(updatedFiliere);
@@ -75,6 +95,7 @@ public class FiliereService {
 
     @Transactional
     public void deleteFiliere(Long id) {
+        // Le reste du code est inchangé...
         Filiere filiere = filiereRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(FILIERE_NOT_FOUND + id));
 
@@ -94,6 +115,8 @@ public class FiliereService {
 
         filiereRepository.delete(filiere);
     }
+
+    // Le reste des méthodes est inchangé...
 
     @Transactional(readOnly = true)
     public List<FiliereDto> getFilieresByProfesseur(Long professeurId) {

@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailwind CSS via CDN</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Test d'importation Excel</title>
 </head>
-<body class="bg-gray-100 text-center">
-  <h1 class="text-4xl font-bold text-blue-500">Hello, reda!</h1>
+<body>
+    <h2>Importation d'étudiants</h2>
+    <form id="uploadForm">
+        <input type="file" id="excelFile" accept=".xlsx,.xls" />
+        <button type="submit">Importer</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('excelFile');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            // Récupérer votre token JWT depuis localStorage ou une autre source
+            const token = localStorage.getItem('jwtToken');
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/filieres/1/students/import', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = `Erreur: ${error.message}`;
+            }
+        });
+    </script>
 </body>
 </html>
