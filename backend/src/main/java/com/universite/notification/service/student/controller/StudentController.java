@@ -1,9 +1,8 @@
-package com.universite.student.controller;
+package com.universite.notification.service.student.controller;
 
-import com.universite.auth.dto.ApiResponse;
 import com.universite.auth.entity.User;
-import com.universite.student.dto.CardRequestDto;
-import com.universite.student.service.CardRequestService;
+import com.universite.notification.service.student.dto.CardRequestDto;
+import com.universite.notification.service.student.service.CardRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,7 +1,7 @@
-package com.universite.student.entity;
+package com.universite.notification.service.student.entity;
 
 import com.universite.auth.entity.User;
-import com.universite.student.entity.enums.CardRequestStatus;
+import com.universite.notification.service.student.entity.enums.CardRequestStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

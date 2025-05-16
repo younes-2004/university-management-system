@@ -55,18 +55,22 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("Configuration CORS");
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        // N'utilisez pas de wildcard (*) si credentials est activé
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-        configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache préflight pour 1 heure
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {

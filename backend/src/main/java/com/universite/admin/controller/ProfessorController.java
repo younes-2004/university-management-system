@@ -19,6 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ProfessorController {
 
+    private final ModuleService moduleService;
     private final UserService userService;
 
     @GetMapping("/professors")
@@ -61,7 +62,7 @@ public class ProfessorController {
     @PutMapping("/professors/{professorId}/modules/{moduleId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> assignModuleToProfessor(@PathVariable Long professorId, @PathVariable Long moduleId) {
-        ModuleService moduleService = null;
+
         moduleService.assignProfessorToModule(moduleId, professorId);
         return ResponseEntity.ok(new ApiResponse(true, "Module assigné au professeur avec succès"));
     }

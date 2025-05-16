@@ -1,6 +1,6 @@
-package com.universite.student.dto;
+package com.universite.notification.service.student.dto;
 
-import com.universite.student.entity.enums.CardRequestStatus;
+import com.universite.notification.service.student.entity.enums.CardRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

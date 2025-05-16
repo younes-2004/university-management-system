@@ -1,4 +1,4 @@
-package com.universite.student.service;
+package com.universite.notification.service.student.service;
 
 import com.universite.auth.entity.User;
 import com.universite.auth.exception.BadRequestException;
@@ -6,10 +6,10 @@ import com.universite.auth.exception.ResourceNotFoundException;
 import com.universite.auth.repository.UserRepository;
 import com.universite.notification.entity.enums.NotificationType;
 import com.universite.notification.service.NotificationService;
-import com.universite.student.dto.CardRequestDto;
-import com.universite.student.entity.CardRequest;
-import com.universite.student.entity.enums.CardRequestStatus;
-import com.universite.student.repository.CardRequestRepository;
+import com.universite.notification.service.student.dto.CardRequestDto;
+import com.universite.notification.service.student.entity.CardRequest;
+import com.universite.notification.service.student.entity.enums.CardRequestStatus;
+import com.universite.notification.service.student.repository.CardRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

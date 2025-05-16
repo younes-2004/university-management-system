@@ -1,4 +1,4 @@
-package com.universite.student.entity.enums;
+package com.universite.notification.service.student.entity.enums;
 
 public enum CardRequestStatus {
     PENDING,     // En attente de traitement

@@ -1,8 +1,8 @@
-package com.universite.student.repository;
+package com.universite.notification.service.student.repository;
 
 import com.universite.auth.entity.User;
-import com.universite.student.entity.CardRequest;
-import com.universite.student.entity.enums.CardRequestStatus;
+import com.universite.notification.service.student.entity.CardRequest;
+import com.universite.notification.service.student.entity.enums.CardRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
