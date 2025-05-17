@@ -1,0 +1,162 @@
+/* Styles pour la page de connexion */
+
+/* Conteneur principal */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-light);
+  background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+  padding: var(--spacing-md);
+}
+
+/* Carte de connexion */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: fade-in-up 0.5s ease-out;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* En-tête du formulaire */
+.login-header {
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.login-header h1 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 28px;
+}
+
+.login-header p {
+  color: var(--color-text-light);
+  margin-bottom: 0;
+}
+
+/* Logo (si vous en ajoutez un) */
+.login-logo {
+  max-width: 120px;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Formulaire */
+.login-form {
+  padding: var(--spacing-lg);
+}
+
+.login-form .form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.login-form input {
+  display: block;
+  width: 100%;
+  padding: 12px var(--spacing-md);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.login-form input:focus {
+  border-color: var(--color-primary-light);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Message d'erreur */
+.login-error {
+  display: none;
+  color: var(--color-error);
+  background-color: rgba(239, 68, 68, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Bouton de connexion */
+.login-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.login-button:hover {
+  background-color: var(--color-primary-light);
+}
+
+.login-button:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Footer du formulaire */
+.login-footer {
+  text-align: center;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.login-footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    box-shadow: none;
+    border-radius: 0;
+  }
+  
+  .login-header {
+    padding-top: var(--spacing-lg);
+  }
+  
+  .login-header h1 {
+    font-size: 24px;
+  }
+}

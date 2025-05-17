@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Étudiants - Système Universitaire</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/modal.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Système Universitaire</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                    <li><a href="filieres.html"><i class="fas fa-graduation-cap"></i> Filières</a></li>
+                    <li><a href="professors.html"><i class="fas fa-chalkboard-teacher"></i> Professeurs</a></li>
+                    <li class="active"><a href="students.html"><i class="fas fa-user-graduate"></i> Étudiants</a></li>
+                    <li><a href="cards.html"><i class="fas fa-id-card"></i> Cartes étudiantes</a></li>
+                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> Administrateurs</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button id="sidebarToggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <span id="userName">Administrateur</span>
+                    <button id="notificationsBtn" class="notifications-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notificationsBadge">0</span>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="content-header">
+                    <h1>Gestion des Étudiants</h1>
+                    <div class="action-buttons">
+                        <button id="importStudentsBtn" class="btn btn-secondary mr-2">
+                            <i class="fas fa-file-import"></i> Importer
+                        </button>
+                        <button id="addStudentBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Ajouter un étudiant
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filtres et recherche -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="filters-container">
+                            <div class="form-group">
+                                <label for="filiereFilter">Filière</label>
+                                <select id="filiereFilter" class="form-control">
+                                    <option value="">Toutes les filières</option>
+                                    <!-- Options générées dynamiquement -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="anneeFilter">Année</label>
+                                <select id="anneeFilter" class="form-control">
+                                    <option value="">Toutes les années</option>
+                                    <option value="PREMIERE_ANNEE">1ère année</option>
+                                    <option value="DEUXIEME_ANNEE">2ème année</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="searchInput">Recherche</label>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Nom, prénom, N° Apogée...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tableau des étudiants -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>N° Apogée</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Email</th>
+                                        <th>Filière</th>
+                                        <th>Année</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Chargement des étudiants...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div id="pagination" class="pagination-container mt-3">
+                            <!-- Pagination générée dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../assets/js/utils/http-client.js"></script>
+    <script src="../../assets/js/api/auth.js"></script>
+    <script src="../../assets/js/utils/auth-guard.js"></script>
+    <script src="../../assets/js/api/notifications.js"></script>
+    <script src="../../assets/js/api/students.js"></script>
+    <script src="../../assets/js/api/filieres.js"></script>
+    <script src="../../assets/js/components/sidebar.js"></script>
+    <script src="../../assets/js/components/modal.js"></script>
+    <script src="../../assets/js/components/pagination.js"></script>
+    <script src="../../assets/js/pages/admin/students.js"></script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+/* Styles pour les pages administrateur */
+
+/* En-tête de contenu avec bouton d'action */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Tableau responsive */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Styles pour les boutons icônes dans les tableaux */
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background-color: var(--color-bg-light);
+}
+
+.btn-icon.edit-filiere:hover {
+  color: var(--color-primary);
+}
+
+.btn-icon.delete-filiere:hover {
+  color: var(--color-error);
+}
+
+/* Spinner de chargement */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-primary);
+  animation: spin 1s linear infinite;
+  margin-right: var(--spacing-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Champ obligatoire */
+.required {
+  color: var(--color-error);
+}
+
+/* Styles pour les statistiques */
+.stats-container {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Carte de filière */
+.filiere-card {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filiere-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.filiere-card-header {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.filiere-card-body {
+  padding: var(--spacing-lg);
+}
+
+.filiere-card-footer {
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-light);
+}
+
+.filiere-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-md);
+}
+
+.filiere-stat {
+  text-align: center;
+}
+
+.filiere-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.filiere-stat-label {
+  font-size: 14px;
+  color: var(--color-text-light);
+}
+
+/* Ajouter ces styles à la fin du fichier admin.css */
+
+/* Petits boutons */
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-info {
+  background-color: var(--color-info);
+  color: white;
+}
+
+.btn-info:hover {
+  opacity: 0.9;
+}
+
+/* Liste des modules */
+.modules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modules-list li {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modules-list li:last-child {
+  border-bottom: none;
+}
+
+.modules-list .text-muted {
+  color: var(--color-text-light);
+  font-size: 14px;
+  margin: var(--spacing-xs) 0;
+}
+
+.module-hours {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  font-size: 14px;
+  color: var(--color-text-light);
+}
+
+/* Ajouter ces styles à la fin du fichier admin.css */
+
+/* Styles pour les filtres */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.filters-container .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Badges de statut */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.status-suspended {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+}
+
+.status-stopped {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+/* Styles pour les détails d'étudiant */
+.student-details {
+  padding: var(--spacing-md) 0;
+}
+
+.student-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.student-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-right: var(--spacing-md);
+}
+
+.student-name h3 {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 20px;
+}
+
+.student-id {
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.student-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.info-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.info-group label {
+  display: block;
+  font-weight: 500;
+  color: var(--color-text-light);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.info-group p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Styles pour l'import */
+.mb-3 {
+  margin-bottom: var(--spacing-md);
+}
+
+.mr-2 {
+  margin-right: var(--spacing-sm);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Petit spinner de chargement */
+.loading-spinner.small {
+  width: 12px;
+  height: 12px;
+  border-width: 1px;
+  margin-right: var(--spacing-xs);
+}
+
+/* Pagination container */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+/* Style pour l'ellipsis de pagination */
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
