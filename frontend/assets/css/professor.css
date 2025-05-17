@@ -1,0 +1,392 @@
+/* Styles spécifiques pour l'interface professeur */
+
+/* États vides et d'erreur */
+.empty-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    text-align: center;
+    background-color: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin: var(--spacing-md) 0;
+}
+
+.empty-state i,
+.error-state i {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.empty-state i {
+    color: var(--color-text-light);
+}
+
+.error-state i {
+    color: var(--color-error);
+}
+
+.error-state p {
+    color: var(--color-error);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Grille de filières */
+.filieres-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.group-title {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.filieres-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.filiere-card {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filiere-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.filiere-header {
+    padding: var(--spacing-md);
+    background-color: var(--color-professor);
+    color: white;
+}
+
+.filiere-header h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.filiere-body {
+    padding: var(--spacing-md);
+}
+
+.filiere-description {
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+    font-size: 14px;
+    line-height: 1.5;
+    max-height: 63px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.filiere-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.filiere-stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-professor);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--color-text-light);
+}
+
+/* Liste de modules */
+.modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.module-card {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.module-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-light);
+}
+
+.module-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.module-filiere {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-top: var(--spacing-xs);
+}
+
+.module-content {
+    padding: var(--spacing-md);
+}
+
+.module-description {
+    margin-bottom: var(--spacing-md);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.module-hours {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+
+.hour-item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: var(--color-text-light);
+}
+
+.hour-item i {
+    margin-right: var(--spacing-xs);
+    color: var(--color-professor);
+}
+
+.module-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Vue des modules */
+.modules-filters {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.loading-spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+.filiere-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.filiere-name {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text);
+    font-size: 22px;
+    border-bottom: 2px solid var(--color-professor);
+    padding-bottom: var(--spacing-xs);
+}
+
+.semestre-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.semestre-name {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text);
+    font-size: 18px;
+    background-color: var(--color-bg-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* Modal des détails de module */
+.module-details {
+    padding: var(--spacing-md) 0;
+}
+
+.module-info {
+    margin-bottom: var(--spacing-lg);
+}
+
+.module-name {
+    margin-bottom: var(--spacing-sm);
+    font-size: 20px;
+    color: var(--color-professor);
+}
+
+.module-meta {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+}
+
+.meta-value {
+    font-weight: 500;
+}
+
+.module-hours-details {
+    margin-top: var(--spacing-md);
+    background-color: var(--color-bg-light);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+.hours-heading {
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+}
+
+.hours-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.hour-box {
+    text-align: center;
+    background-color: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    flex: 1;
+}
+
+.hour-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-professor);
+    margin-bottom: var(--spacing-xs);
+}
+
+.hour-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+}
+
+.elements-section {
+    margin-top: var(--spacing-lg);
+}
+
+.elements-section h3 {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.elements-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.element-card {
+    background-color: var(--color-bg-light);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.element-title {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 16px;
+    color: var(--color-text);
+}
+
+.element-description {
+    font-size: 14px;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-light);
+}
+
+.element-hours {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    font-size: 13px;
+}
+
+.no-elements {
+    color: var(--color-text-light);
+    font-style: italic;
+    text-align: center;
+    padding: var(--spacing-md);
+}
+
+.view-all-link {
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+/* Styles pour mobiles */
+@media (max-width: 768px) {
+    .modules-filters {
+        flex-direction: column;
+    }
+    
+    .hours-grid {
+        flex-direction: column;
+    }
+    
+    .filiere-stats {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .filieres-grid,
+    .modules-grid,
+    .elements-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .module-meta {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+}

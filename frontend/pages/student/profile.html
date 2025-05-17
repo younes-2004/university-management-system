@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - Système Universitaire</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/student.css">
+    <link rel="stylesheet" href="../../assets/css/modal.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Système Universitaire</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                    <li class="active"><a href="profile.html"><i class="fas fa-user"></i> Mon profil</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button id="sidebarToggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <span id="userName">Étudiant</span>
+                    <button id="notificationsBtn" class="notifications-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notificationsBadge">0</span>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <h1>Mon Profil</h1>
+                
+                <!-- Profil détaillé -->
+                <div class="card profile-card">
+                    <div class="card-body">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="profile-actions">
+                                <button id="changePasswordBtn" class="btn btn-secondary">
+                                    <i class="fas fa-key"></i> Changer mot de passe
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details">
+                            <div class="detail-section">
+                                <h3>Informations personnelles</h3>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Nom complet:</span>
+                                        <span class="detail-value" id="fullName">Chargement...</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Numéro Apogée:</span>
+                                        <span class="detail-value" id="apogeeNumber">Chargement...</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Email:</span>
+                                        <span class="detail-value" id="emailAddress">Chargement...</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Date de naissance:</span>
+                                        <span class="detail-value" id="birthDate">Chargement...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-section">
+                                <h3>Informations académiques</h3>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Filière:</span>
+                                        <span class="detail-value" id="filiereName">Chargement...</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Année:</span>
+                                        <span class="detail-value" id="studyYear">Chargement...</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Statut:</span>
+                                        <span class="detail-value" id="studentStatus">Chargement...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Carte Étudiant -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2>Ma Carte Étudiant</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="cardStatus">
+                            <p>Chargement du statut de la carte...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../assets/js/utils/http-client.js"></script>
+    <script src="../../assets/js/api/auth.js"></script>
+    <script src="../../assets/js/utils/auth-guard.js"></script>
+    <script src="../../assets/js/api/cards.js"></script>
+    <script src="../../assets/js/api/notifications.js"></script>
+    <script src="../../assets/js/components/sidebar.js"></script>
+    <script src="../../assets/js/components/modal.js"></script>
+    <script src="../../assets/js/pages/student/profile.js"></script>
+</body>
+</html>

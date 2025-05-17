@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Modules - Système Universitaire</title>
+    <title>Mes Notifications - Système Universitaire</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
-    <link rel="stylesheet" href="../../assets/css/professor.css">
-    <link rel="stylesheet" href="../../assets/css/modal.css">
+    <link rel="stylesheet" href="../../assets/css/student.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -21,7 +20,8 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
-                    <li class="active"><a href="modules.html"><i class="fas fa-book"></i> Modules enseignés</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Mon profil</a></li>
+                    <li class="active"><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -36,7 +36,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="user-info">
-                    <span id="userName">Professeur</span>
+                    <span id="userName">Étudiant</span>
                     <button id="notificationsBtn" class="notifications-btn">
                         <i class="fas fa-bell"></i>
                         <span class="badge" id="notificationsBadge">0</span>
@@ -46,33 +46,18 @@
             
             <div class="content">
                 <div class="content-header">
-                    <h1>Mes Modules Enseignés</h1>
-                    <div class="modules-filters">
-                        <div class="form-group">
-                            <label for="filiereFilter">Filière:</label>
-                            <select id="filiereFilter">
-                                <option value="all">Toutes les filières</option>
-                                <!-- Options générées dynamiquement -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="semestreFilter">Semestre:</label>
-                            <select id="semestreFilter">
-                                <option value="all">Tous les semestres</option>
-                                <option value="1">Semestre 1</option>
-                                <option value="2">Semestre 2</option>
-                                <option value="3">Semestre 3</option>
-                                <option value="4">Semestre 4</option>
-                            </select>
-                        </div>
-                    </div>
+                    <h1>Mes Notifications</h1>
+                    <button id="markAllReadBtn" class="btn btn-secondary">
+                        <i class="fas fa-check-double"></i> Marquer tout comme lu
+                    </button>
                 </div>
                 
-                <!-- Modules par filière et semestre -->
-                <div id="modulesBySemester">
-                    <div class="loading-spinner-container">
-                        <div class="loading-spinner"></div>
-                        <p>Chargement des modules...</p>
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="notificationsContainer">
+                            <p>Chargement des notifications...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,10 +69,7 @@
     <script src="../../assets/js/api/auth.js"></script>
     <script src="../../assets/js/utils/auth-guard.js"></script>
     <script src="../../assets/js/api/notifications.js"></script>
-    <script src="../../assets/js/api/modules.js"></script>
-    <script src="../../assets/js/api/elements.js"></script>
     <script src="../../assets/js/components/sidebar.js"></script>
-    <script src="../../assets/js/components/modal.js"></script>
-    <script src="../../assets/js/pages/professor/modules.js"></script>
+    <script src="../../assets/js/pages/student/notifications.js"></script>
 </body>
 </html>

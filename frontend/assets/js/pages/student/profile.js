@@ -5,19 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Références des éléments DOM
-  const studentNameElement = document.getElementById('studentName');
-  const studentFiliereElement = document.getElementById('studentFiliere');
-  const studentYearElement = document.getElementById('studentYear');
+  const fullNameElement = document.getElementById('fullName');
+  const apogeeNumberElement = document.getElementById('apogeeNumber');
+  const emailAddressElement = document.getElementById('emailAddress');
+  const birthDateElement = document.getElementById('birthDate');
+  const filiereNameElement = document.getElementById('filiereName');
+  const studyYearElement = document.getElementById('studyYear');
+  const studentStatusElement = document.getElementById('studentStatus');
   const cardStatusElement = document.getElementById('cardStatus');
-  const recentNotificationsElement = document.getElementById('recentNotifications');
+  const changePasswordBtn = document.getElementById('changePasswordBtn');
 
   // Charger les données de l'étudiant
-  loadStudentData();
+  loadStudentProfile();
   loadCardStatus();
-  loadNotifications();
 
-  // Fonction pour charger les données de l'étudiant
-  async function loadStudentData() {
+  // Event listener pour le bouton de changement de mot de passe
+  changePasswordBtn.addEventListener('click', showChangePasswordModal);
+
+  // Fonction pour charger le profil de l'étudiant
+  async function loadStudentProfile() {
     try {
       const user = await httpClient.get('/auth/profile');
       
@@ -26,24 +32,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      // Mettre à jour les informations de profil
-      studentNameElement.textContent = `${user.prenom} ${user.nom}`;
+      // Mettre à jour le nom dans la barre supérieure
+      const userNameElement = document.getElementById('userName');
+      if (userNameElement) {
+        userNameElement.textContent = `${user.prenom} ${user.nom}`;
+      }
+      
+      // Mettre à jour les informations personnelles
+      fullNameElement.textContent = `${user.prenom} ${user.nom}`;
+      apogeeNumberElement.textContent = user.nApogee || 'Non assigné';
+      emailAddressElement.textContent = user.email;
+      birthDateElement.textContent = formatDate(user.dateNaissance);
+      
+      // Mettre à jour les informations académiques
+      studyYearElement.textContent = user.annee === 'PREMIERE_ANNEE' ? '1ère année' : '2ème année';
+      studentStatusElement.textContent = formatStatus(user.statut);
+      studentStatusElement.className = `detail-value status-${user.statut ? user.statut.toLowerCase() : 'unknown'}`;
       
       // Charger les informations de la filière si disponible
       if (user.filiereId) {
         try {
           const filiere = await httpClient.get(`/filieres/${user.filiereId}`);
-          studentFiliereElement.textContent = `Filière: ${filiere.nom}`;
+          filiereNameElement.textContent = filiere.nom;
         } catch (error) {
-          studentFiliereElement.textContent = 'Filière: Non assignée';
+          filiereNameElement.textContent = 'Non assignée';
           console.error('Erreur lors du chargement de la filière:', error);
         }
       } else {
-        studentFiliereElement.textContent = 'Filière: Non assignée';
+        filiereNameElement.textContent = 'Non assignée';
       }
-      
-      // Afficher l'année
-      studentYearElement.textContent = `Année: ${user.annee === 'PREMIERE_ANNEE' ? '1ère année' : '2ème année'}`;
       
     } catch (error) {
       console.error('Erreur lors du chargement des données de l\'étudiant:', error);
@@ -166,44 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Fonction pour charger les notifications
-  async function loadNotifications() {
-    try {
-      const notifications = await notificationService.getUserNotifications();
-      
-      if (!notifications || notifications.length === 0) {
-        recentNotificationsElement.innerHTML = `
-          <p>Aucune notification pour le moment</p>
-        `;
-        return;
-      }
-      
-      // Afficher les 5 dernières notifications
-      const recentNotifs = notifications.slice(0, 5);
-      
-      recentNotificationsElement.innerHTML = `
-        <ul class="notifications-list">
-          ${recentNotifs.map(notif => `
-            <li class="notification-item ${notif.vue ? 'read' : 'unread'}">
-              <div class="notification-header">
-                <span class="notification-type">${formatNotificationType(notif.type)}</span>
-                <span class="notification-time">${formatTimeAgo(notif.dateCreation)}</span>
-              </div>
-              <div class="notification-content">${escapeHtml(notif.message)}</div>
-            </li>
-          `).join('')}
-        </ul>
-        ${notifications.length > 5 ? `<a href="notifications.html" class="view-all-link">Voir toutes les notifications (${notifications.length})</a>` : ''}
-      `;
-      
-    } catch (error) {
-      console.error('Erreur lors du chargement des notifications:', error);
-      recentNotificationsElement.innerHTML = `
-        <p class="error-message">Erreur lors du chargement des notifications</p>
-      `;
-    }
-  }
-
   // Fonction pour demander une nouvelle carte
   async function requestCard() {
     try {
@@ -258,63 +237,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Fonction pour afficher le modal de changement de mot de passe
+  function showChangePasswordModal() {
+    const content = `
+      <form id="changePasswordForm">
+        <div class="form-group">
+          <label for="oldPassword">Ancien mot de passe <span class="required">*</span></label>
+          <input type="password" id="oldPassword" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="newPassword">Nouveau mot de passe <span class="required">*</span></label>
+          <input type="password" id="newPassword" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer le mot de passe <span class="required">*</span></label>
+          <input type="password" id="confirmPassword" required>
+        </div>
+        
+        <div id="passwordError" class="error-message"></div>
+      </form>
+    `;
+    
+    const footer = `
+      <button type="button" class="btn btn-secondary" id="cancelPasswordBtn">Annuler</button>
+      <button type="button" class="btn btn-primary" id="savePasswordBtn">Enregistrer</button>
+    `;
+    
+    modal.open('Changer le mot de passe', content, footer);
+    
+    // Ajouter les event listeners
+    document.getElementById('cancelPasswordBtn').addEventListener('click', () => modal.close());
+    document.getElementById('savePasswordBtn').addEventListener('click', changePassword);
+  }
+
+  // Fonction pour changer le mot de passe
+  async function changePassword() {
+    const oldPassword = document.getElementById('oldPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const passwordError = document.getElementById('passwordError');
+    
+    // Validation
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      passwordError.textContent = 'Tous les champs sont obligatoires';
+      passwordError.style.display = 'block';
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      passwordError.textContent = 'Les mots de passe ne correspondent pas';
+      passwordError.style.display = 'block';
+      return;
+    }
+    
+    try {
+      const response = await httpClient.post('/auth/change-password', { oldPassword, newPassword });
+      
+      modal.close();
+      showNotification('Mot de passe changé avec succès', 'success');
+    } catch (error) {
+      console.error('Erreur lors du changement de mot de passe:', error);
+      
+      let errorMessage = 'Erreur lors du changement de mot de passe';
+      if (error.message === 'Ancien mot de passe incorrect') {
+        errorMessage = 'L\'ancien mot de passe est incorrect';
+      }
+      
+      passwordError.textContent = errorMessage;
+      passwordError.style.display = 'block';
+    }
+  }
+
   // Fonctions utilitaires
   function formatDate(dateString) {
-    if (!dateString) return '';
+    if (!dateString) return 'Non renseigné';
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return date.toLocaleDateString('fr-FR');
   }
 
-  function formatTimeAgo(dateString) {
-    if (!dateString) return '';
+  function formatStatus(status) {
+    if (!status) return 'Inconnu';
     
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) {
-      return 'à l\'instant';
-    } else if (diffInSeconds < 3600) {
-      const minutes = Math.floor(diffInSeconds / 60);
-      return `Il y a ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
-    } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600);
-      return `Il y a ${hours} ${hours === 1 ? 'heure' : 'heures'}`;
-    } else if (diffInSeconds < 604800) {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `Il y a ${days} ${days === 1 ? 'jour' : 'jours'}`;
-    } else {
-      return formatDate(dateString);
+    switch (status) {
+      case 'ACTIF': return 'Actif';
+      case 'SUSPENDU': return 'Suspendu';
+      case 'ARRETE': return 'Arrêté';
+      default: return status;
     }
-  }
-
-  function formatNotificationType(type) {
-    if (!type) return 'Information';
-    
-    switch (type) {
-      case 'CARD_REQUEST': return 'Demande de carte';
-      case 'CARD_APPROVED': return 'Carte approuvée';
-      case 'CARD_REJECTED': return 'Carte rejetée';
-      case 'CARD_RECEIVED': return 'Carte reçue';
-      case 'SYSTEM': return 'Système';
-      default: return type;
-    }
-  }
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
   }
 
   // Fonction pour afficher les notifications

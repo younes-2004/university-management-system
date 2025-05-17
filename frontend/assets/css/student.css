@@ -1,0 +1,378 @@
+/* Styles spécifiques pour l'interface étudiant */
+
+/* Profil de l'étudiant */
+.profile-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--color-primary-lighter);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.profile-details {
+    margin-top: var(--spacing-lg);
+}
+
+.detail-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.detail-section h3 {
+    font-size: 18px;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-sm);
+}
+
+.detail-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Statut étudiant */
+.status-actif {
+    color: var(--color-success);
+}
+
+.status-suspendu {
+    color: var(--color-warning);
+}
+
+.status-arrete {
+    color: var(--color-error);
+}
+
+/* Gestion des cartes */
+.card-status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.card-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+    width: 100%;
+    max-width: 400px;
+}
+
+.card-status i {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+}
+
+.card-status span {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.card-status.incomplete {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: var(--color-text-light);
+}
+
+.card-status.pending {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.card-status.approved {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--color-primary);
+}
+
+.card-status.rejected {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+}
+
+.card-status.complete {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+}
+
+.request-date,
+.request-info {
+    margin: var(--spacing-md) 0;
+    color: var(--color-text-light);
+    font-size: 14px;
+}
+
+/* Notifications */
+.notifications-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    padding: var(--spacing-md);
+    border-left: 3px solid transparent;
+    margin-bottom: var(--spacing-sm);
+    background-color: var(--color-bg-light);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.notification-item.unread {
+    border-left-color: var(--color-primary);
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+}
+
+.notification-type {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--color-primary);
+}
+
+.notification-time {
+    font-size: 12px;
+    color: var(--color-text-light);
+}
+
+.notification-content {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.view-all-link {
+    display: block;
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+.error-message {
+    color: var(--color-error);
+    padding: var(--spacing-md);
+    background-color: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+/* Notifications list page */
+.empty-notifications {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-light);
+}
+
+.empty-notifications i {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.notifications-date-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.date-header {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.mark-read-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    margin-top: var(--spacing-xs);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.mark-read-btn i {
+    margin-right: var(--spacing-xs);
+}
+
+.mark-read-btn:hover {
+    text-decoration: underline;
+}
+
+.notification-details {
+    padding: var(--spacing-md);
+}
+
+.notification-details-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.notification-details-content {
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.notification-actions {
+    margin-top: var(--spacing-md);
+    text-align: center;
+}
+.card-preview {
+    margin: var(--spacing-lg) 0;
+    display: flex;
+    justify-content: center;
+}
+
+.student-card {
+    width: 340px;
+    height: 210px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    border-radius: var(--radius-md);
+    color: white;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.student-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.student-card .card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.university-logo {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+}
+
+.student-card .card-body {
+    flex: 1;
+    display: flex;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+.student-photo {
+    width: 70px;
+    height: 70px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.student-info {
+    flex: 1;
+}
+
+.student-info h4 {
+    margin: 0 0 var(--spacing-xs);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.student-info p {
+    margin: 0 0 4px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.student-card .card-footer {
+    padding: var(--spacing-xs) var(--spacing-md);
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    text-align: center;
+}
+
+.card-tip {
+    margin-top: var(--spacing-md);
+    font-style: italic;
+    color: var(--color-text-light);
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile-actions {
+        margin-top: var(--spacing-md);
+    }
+    
+    .student-card {
+        width: 100%;
+        max-width: 340px;
+    }
+}
