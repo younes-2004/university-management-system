@@ -106,9 +106,34 @@
             </div>
         </main>
     </div>
+    <!-- Ajoutez ceci après la section des statistiques dans le fichier dashboard.html -->
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h2>Statistiques des étudiants</h2>
+      </div>
+      <div class="card-body">
+        <canvas id="studentsChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h2>Statistiques des demandes de carte</h2>
+      </div>
+      <div class="card-body">
+        <canvas id="cardRequestsChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
     
     <!-- Scripts -->
     <script src="../../assets/js/utils/http-client.js"></script>
+    <!-- Ajoutez cela juste avant les scripts existants -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../assets/js/api/auth.js"></script>
     <script src="../../assets/js/utils/auth-guard.js"></script>
     <script src="../../assets/js/api/admin.js"></script>
