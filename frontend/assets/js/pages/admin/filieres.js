@@ -61,6 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="filiere-stat-value">${filiere.nombreModules}</div>
               <div class="filiere-stat-label">Modules</div>
             </div>
+            <div class="filiere-stat">
+              <div class="filiere-stat-value">${filiere.nombreAnnees || 2}</div>
+              <div class="filiere-stat-label">Années d'études</div>
+            </div>
           </div>
           <div class="filiere-actions">
             <button class="btn btn-sm btn-info view-filiere" data-id="${filiere.id}">
@@ -102,14 +106,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fonction commune pour gérer la complétion de l'assistant
   function handleWizardComplete(data) {
-    return async () => {
-      try {
-        console.log("Fonction onComplete exécutée", data);
-        // Soumettre les données à l'API
-        if (editingFiliereId) {
-          await filiereService.updateFiliere(editingFiliereId, data.basicInfo);
-        } else {
-          const createdFiliere = await filiereService.createFiliere(data.basicInfo);
+  return async () => {
+    try {
+      // Correction pour le problème nombreAnnees null
+      if (!data.basicInfo.nombreAnnees) {
+        data.basicInfo.nombreAnnees = 2; // Valeur par défaut
+      }
+      
+      console.log("Fonction onComplete exécutée", data);
+      
+      // Soumettre les données à l'API
+      if (editingFiliereId) {
+        await filiereService.updateFiliere(editingFiliereId, data.basicInfo);
+      } else {
+        // Afficher les données pour le débogage
+        console.log("Données filière à créer:", JSON.stringify(data.basicInfo));
+        
+        const createdFiliere = await filiereService.createFiliere(data.basicInfo);
           
           // Créer les modules pour chaque semestre
           if (data.semestres) {
@@ -150,12 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         showNotification(editingFiliereId ? 'Filière mise à jour avec succès' : 'Filière créée avec succès', 'success');
-        modal.close();
-        loadFilieres();
-      } catch (error) {
-        showError('Erreur lors de l\'enregistrement de la filière');
-        console.error('Erreur:', error);
-      }
+      modal.close();
+      loadFilieres();
+    } catch (error) {
+      console.error('Erreur détaillée lors de l\'enregistrement de la filière:', error);
+      showError('Erreur lors de l\'enregistrement de la filière: ' + (error.message || 'Erreur serveur'));
+    }
     };
   }
 
@@ -258,6 +271,14 @@ document.addEventListener('DOMContentLoaded', () => {
           <textarea id="description" name="description" rows="4" required>${basicInfo.description || ''}</textarea>
         </div>
         
+        <div class="form-group">
+          <label for="nombreAnnees">Nombre d'années d'études <span class="required">*</span></label>
+          <select id="nombreAnnees" name="nombreAnnees" required>
+            <option value="1" ${basicInfo.nombreAnnees === 1 ? 'selected' : ''}>1 année</option>
+            <option value="2" ${basicInfo.nombreAnnees === 2 || !basicInfo.nombreAnnees ? 'selected' : ''}>2 années</option>
+          </select>
+        </div>
+        
         <div id="formError" class="error-message"></div>
       </div>
     `;
@@ -283,7 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return {
       basicInfo: {
         nom: document.getElementById('nom').value.trim(),
-        description: document.getElementById('description').value.trim()
+        description: document.getElementById('description').value.trim(),
+        nombreAnnees: parseInt(document.getElementById('nombreAnnees').value)
       }
     };
   }
@@ -292,94 +314,116 @@ document.addEventListener('DOMContentLoaded', () => {
   function generateSemestresStep(data = {}) {
     // Initialiser les données des semestres si non définies
     if (!data.semestres) {
-      data.semestres = [
-        { numero: 1, modules: [] },
-        { numero: 2, modules: [] }
-      ];
+      const nombreAnnees = data.basicInfo?.nombreAnnees || 2;
+      data.semestres = [];
+      
+      // Créer les semestres pour chaque année
+      for (let annee = 1; annee <= nombreAnnees; annee++) {
+        // Chaque année a 2 semestres
+        data.semestres.push(
+          { numero: (annee - 1) * 2 + 1, annee: annee, modules: [] },
+          { numero: (annee - 1) * 2 + 2, annee: annee, modules: [] }
+        );
+      }
     }
+    
+    // Organiser les semestres par année
+    const semestresByAnnee = {};
+    data.semestres.forEach(semestre => {
+      if (!semestresByAnnee[semestre.annee]) {
+        semestresByAnnee[semestre.annee] = [];
+      }
+      semestresByAnnee[semestre.annee].push(semestre);
+    });
     
     let semestresHtml = '';
     
-    data.semestres.forEach(semestre => {
-      let modulesHtml = '';
+    // Générer l'HTML par année
+    Object.keys(semestresByAnnee).sort().forEach(annee => {
+      semestresHtml += `<h3 class="annee-title">Année ${annee}</h3>`;
       
-      if (semestre.modules && semestre.modules.length > 0) {
-        semestre.modules.forEach((module, moduleIndex) => {
-          modulesHtml += `
-            <div class="module-card" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
-              <div class="module-header">
-                <h4 class="module-title">${escapeHtml(module.nom)}</h4>
-                <div class="module-actions">
-                  <button type="button" class="btn-icon edit-module" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button type="button" class="btn-icon delete-module" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
-                    <i class="fas fa-trash"></i>
-                  </button>
+      // Générer les semestres de cette année
+      semestresByAnnee[annee].sort((a, b) => a.numero - b.numero).forEach(semestre => {
+        let modulesHtml = '';
+        
+        if (semestre.modules && semestre.modules.length > 0) {
+          semestre.modules.forEach((module, moduleIndex) => {
+            modulesHtml += `
+              <div class="module-card" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
+                <div class="module-header">
+                  <h4 class="module-title">${escapeHtml(module.nom)}</h4>
+                  <div class="module-actions">
+                    <button type="button" class="btn-icon edit-module" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn-icon delete-module" data-semestre="${semestre.numero}" data-index="${moduleIndex}">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <p>${escapeHtml(module.description)}</p>
+                <div class="horaires-container">
+                  <span class="horaire-item">Cours: ${module.heuresCours || 0}h</span>
+                  <span class="horaire-item">TD: ${module.heuresTD || 0}h</span>
+                  <span class="horaire-item">TP: ${module.heuresTP || 0}h</span>
                 </div>
               </div>
-              <p>${escapeHtml(module.description)}</p>
-              <div class="horaires-container">
-                <span class="horaire-item">Cours: ${module.heuresCours || 0}h</span>
-                <span class="horaire-item">TD: ${module.heuresTD || 0}h</span>
-                <span class="horaire-item">TP: ${module.heuresTP || 0}h</span>
-              </div>
-            </div>
-          `;
-        });
-      }
-      
-      semestresHtml += `
-        <div class="semestre-card" data-semestre="${semestre.numero}">
-          <div class="semestre-header">
-            <h3 class="semestre-title">Semestre ${semestre.numero}</h3>
-            <button type="button" class="btn btn-sm btn-primary add-module-btn" data-semestre="${semestre.numero}">
-              <i class="fas fa-plus"></i> Ajouter un module
-            </button>
-          </div>
-          
-          <div class="modules-container" id="modulesContainer${semestre.numero}">
-            ${modulesHtml || '<p>Aucun module ajouté pour ce semestre.</p>'}
-          </div>
-          
-          <div id="addModuleForm${semestre.numero}" class="add-module-form" style="display: none;">
-            <h4>Ajouter un module</h4>
-            <div class="form-group">
-              <label for="moduleNom${semestre.numero}">Nom du module <span class="required">*</span></label>
-              <input type="text" id="moduleNom${semestre.numero}" required>
+            `;
+          });
+        }
+        
+        semestresHtml += `
+          <div class="semestre-card" data-semestre="${semestre.numero}" data-annee="${semestre.annee}">
+            <div class="semestre-header">
+              <h3 class="semestre-title">Semestre ${semestre.numero}</h3>
+              <button type="button" class="btn btn-sm btn-primary add-module-btn" data-semestre="${semestre.numero}">
+                <i class="fas fa-plus"></i> Ajouter un module
+              </button>
             </div>
             
-            <div class="form-group">
-              <label for="moduleDesc${semestre.numero}">Description <span class="required">*</span></label>
-              <textarea id="moduleDesc${semestre.numero}" rows="2" required></textarea>
+            <div class="modules-container" id="modulesContainer${semestre.numero}">
+              ${modulesHtml || '<p>Aucun module ajouté pour ce semestre.</p>'}
             </div>
             
-            <div class="form-row">
+            <div id="addModuleForm${semestre.numero}" class="add-module-form" style="display: none;">
+              <h4>Ajouter un module</h4>
               <div class="form-group">
-                <label for="moduleCours${semestre.numero}">Heures de cours</label>
-                <input type="number" id="moduleCours${semestre.numero}" min="0" value="0">
+                <label for="moduleNom${semestre.numero}">Nom du module <span class="required">*</span></label>
+                <input type="text" id="moduleNom${semestre.numero}" required>
               </div>
               
               <div class="form-group">
-                <label for="moduleTD${semestre.numero}">Heures de TD</label>
-                <input type="number" id="moduleTD${semestre.numero}" min="0" value="0">
+                <label for="moduleDesc${semestre.numero}">Description <span class="required">*</span></label>
+                <textarea id="moduleDesc${semestre.numero}" rows="2" required></textarea>
               </div>
               
-              <div class="form-group">
-                <label for="moduleTP${semestre.numero}">Heures de TP</label>
-                <input type="number" id="moduleTP${semestre.numero}" min="0" value="0">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="moduleCours${semestre.numero}">Heures de cours</label>
+                  <input type="number" id="moduleCours${semestre.numero}" min="0" value="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="moduleTD${semestre.numero}">Heures de TD</label>
+                  <input type="number" id="moduleTD${semestre.numero}" min="0" value="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="moduleTP${semestre.numero}">Heures de TP</label>
+                  <input type="number" id="moduleTP${semestre.numero}" min="0" value="0">
+                </div>
+              </div>
+              
+              <div id="moduleFormError${semestre.numero}" class="error-message"></div>
+              
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary cancel-module-btn" data-semestre="${semestre.numero}">Annuler</button>
+                <button type="button" class="btn btn-primary save-module-btn" data-semestre="${semestre.numero}">Ajouter</button>
               </div>
             </div>
-            
-            <div id="moduleFormError${semestre.numero}" class="error-message"></div>
-            
-            <div class="form-actions">
-              <button type="button" class="btn btn-secondary cancel-module-btn" data-semestre="${semestre.numero}">Annuler</button>
-              <button type="button" class="btn btn-primary save-module-btn" data-semestre="${semestre.numero}">Ajouter</button>
-            </div>
           </div>
-        </div>
-      `;
+        `;
+      });
     });
     
     return `
@@ -441,10 +485,17 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Ajouter le module aux données
           if (!wizardData.semestres) {
-            wizardData.semestres = [
-              { numero: 1, modules: [] },
-              { numero: 2, modules: [] }
-            ];
+            const nombreAnnees = wizardData.basicInfo?.nombreAnnees || 2;
+            wizardData.semestres = [];
+            
+            // Créer les semestres pour chaque année
+            for (let annee = 1; annee <= nombreAnnees; annee++) {
+              // Chaque année a 2 semestres
+              wizardData.semestres.push(
+                { numero: (annee - 1) * 2 + 1, annee: annee, modules: [] },
+                { numero: (annee - 1) * 2 + 2, annee: annee, modules: [] }
+              );
+            }
           }
           
           const semestreIndex = wizardData.semestres.findIndex(s => s.numero == semestre);
@@ -607,11 +658,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Vérifier qu'au moins un module est défini par semestre
     let isValid = true;
     
+    // Groupe les semestres par année pour l'affichage des messages d'erreur
+    const semestresByAnnee = {};
     wizardData.semestres.forEach(semestre => {
-      if (!semestre.modules || semestre.modules.length === 0) {
-        isValid = false;
-        alert(`Vous devez ajouter au moins un module pour le semestre ${semestre.numero}`);
+      if (!semestresByAnnee[semestre.annee]) {
+        semestresByAnnee[semestre.annee] = [];
       }
+      semestresByAnnee[semestre.annee].push(semestre);
+    });
+    
+    Object.entries(semestresByAnnee).forEach(([annee, semestres]) => {
+      semestres.forEach(semestre => {
+        if (!semestre.modules || semestre.modules.length === 0) {
+          isValid = false;
+          alert(`Vous devez ajouter au moins un module pour le semestre ${semestre.numero} (Année ${annee})`);
+        }
+      });
     });
     
     return isValid;
@@ -629,95 +691,110 @@ document.addEventListener('DOMContentLoaded', () => {
       return '<p>Veuillez d\'abord définir les modules dans l\'étape précédente.</p>';
     }
     
+    // Organiser les semestres par année
+    const semestresByAnnee = {};
+    data.semestres.forEach(semestre => {
+      if (!semestresByAnnee[semestre.annee]) {
+        semestresByAnnee[semestre.annee] = [];
+      }
+      semestresByAnnee[semestre.annee].push(semestre);
+    });
+    
     let elementsHtml = '';
     
-    data.semestres.forEach(semestre => {
-      if (!semestre.modules || semestre.modules.length === 0) {
-        return;
-      }
+    // Générer l'HTML par année et semestre
+    Object.keys(semestresByAnnee).sort().forEach(annee => {
+      elementsHtml += `<h3 class="annee-title">Année ${annee}</h3>`;
       
-      elementsHtml += `<h3>Semestre ${semestre.numero}</h3>`;
-      
-      semestre.modules.forEach((module, moduleIndex) => {
-        let elementsListHtml = '';
-        
-        if (module.elements && module.elements.length > 0) {
-          module.elements.forEach((element, elementIndex) => {
-            elementsListHtml += `
-              <div class="element-card" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
-                <div class="element-header">
-                  <h5 class="element-title">${escapeHtml(element.nom)}</h5>
-                  <div class="element-actions">
-                    <button type="button" class="btn-icon edit-element" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button type="button" class="btn-icon delete-element" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </div>
-                <p>${escapeHtml(element.description)}</p>
-                <div class="horaires-container">
-                  <span class="horaire-item">Cours: ${element.heuresCours || 0}h</span>
-                  <span class="horaire-item">TD: ${element.heuresTD || 0}h</span>
-                  <span class="horaire-item">TP: ${element.heuresTP || 0}h</span>
-                </div>
-              </div>
-            `;
-          });
+      // Générer les semestres de cette année
+      semestresByAnnee[annee].sort((a, b) => a.numero - b.numero).forEach(semestre => {
+        if (!semestre.modules || semestre.modules.length === 0) {
+          return;
         }
         
-        elementsHtml += `
-          <div class="module-elements-container" data-semestre="${semestre.numero}" data-module="${moduleIndex}">
-            <div class="module-header">
-              <h4>${escapeHtml(module.nom)}</h4>
-              <button type="button" class="btn btn-sm btn-primary add-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">
-                <i class="fas fa-plus"></i> Ajouter un élément
-              </button>
-            </div>
-            
-            <div class="elements-container">
-              ${elementsListHtml || '<p>Aucun élément ajouté pour ce module.</p>'}
-            </div>
-            
-            <div id="addElementForm${semestre.numero}${moduleIndex}" class="add-element-form" style="display: none;">
-              <h4>Ajouter un élément</h4>
-              <div class="form-group">
-                <label for="elementNom${semestre.numero}${moduleIndex}">Nom de l'élément <span class="required">*</span></label>
-                <input type="text" id="elementNom${semestre.numero}${moduleIndex}" required>
+        elementsHtml += `<h4>Semestre ${semestre.numero}</h4>`;
+        
+        semestre.modules.forEach((module, moduleIndex) => {
+          let elementsListHtml = '';
+          
+          if (module.elements && module.elements.length > 0) {
+            module.elements.forEach((element, elementIndex) => {
+              elementsListHtml += `
+                <div class="element-card" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
+                  <div class="element-header">
+                    <h5 class="element-title">${escapeHtml(element.nom)}</h5>
+                    <div class="element-actions">
+                      <button type="button" class="btn-icon edit-element" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button type="button" class="btn-icon delete-element" data-semestre="${semestre.numero}" data-module="${moduleIndex}" data-index="${elementIndex}">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <p>${escapeHtml(element.description)}</p>
+                  <div class="horaires-container">
+                    <span class="horaire-item">Cours: ${element.heuresCours || 0}h</span>
+                    <span class="horaire-item">TD: ${element.heuresTD || 0}h</span>
+                    <span class="horaire-item">TP: ${element.heuresTP || 0}h</span>
+                  </div>
+                </div>
+              `;
+            });
+          }
+          
+          elementsHtml += `
+            <div class="module-elements-container" data-semestre="${semestre.numero}" data-module="${moduleIndex}">
+              <div class="module-header">
+                <h4>${escapeHtml(module.nom)}</h4>
+                <button type="button" class="btn btn-sm btn-primary add-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">
+                  <i class="fas fa-plus"></i> Ajouter un élément
+                </button>
               </div>
               
-              <div class="form-group">
-                <label for="elementDesc${semestre.numero}${moduleIndex}">Description <span class="required">*</span></label>
-                <textarea id="elementDesc${semestre.numero}${moduleIndex}" rows="2" required></textarea>
+              <div class="elements-container">
+                ${elementsListHtml || '<p>Aucun élément ajouté pour ce module.</p>'}
               </div>
               
-              <div class="form-row">
+              <div id="addElementForm${semestre.numero}${moduleIndex}" class="add-element-form" style="display: none;">
+                <h4>Ajouter un élément</h4>
                 <div class="form-group">
-                  <label for="elementCours${semestre.numero}${moduleIndex}">Heures de cours</label>
-                  <input type="number" id="elementCours${semestre.numero}${moduleIndex}" min="0" value="0">
+                  <label for="elementNom${semestre.numero}${moduleIndex}">Nom de l'élément <span class="required">*</span></label>
+                  <input type="text" id="elementNom${semestre.numero}${moduleIndex}" required>
                 </div>
                 
                 <div class="form-group">
-                  <label for="elementTD${semestre.numero}${moduleIndex}">Heures de TD</label>
-                  <input type="number" id="elementTD${semestre.numero}${moduleIndex}" min="0" value="0">
+                  <label for="elementDesc${semestre.numero}${moduleIndex}">Description <span class="required">*</span></label>
+                  <textarea id="elementDesc${semestre.numero}${moduleIndex}" rows="2" required></textarea>
                 </div>
                 
-                <div class="form-group">
-                  <label for="elementTP${semestre.numero}${moduleIndex}">Heures de TP</label>
-                  <input type="number" id="elementTP${semestre.numero}${moduleIndex}" min="0" value="0">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="elementCours${semestre.numero}${moduleIndex}">Heures de cours</label>
+                    <input type="number" id="elementCours${semestre.numero}${moduleIndex}" min="0" value="0">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="elementTD${semestre.numero}${moduleIndex}">Heures de TD</label>
+                    <input type="number" id="elementTD${semestre.numero}${moduleIndex}" min="0" value="0">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="elementTP${semestre.numero}${moduleIndex}">Heures de TP</label>
+                    <input type="number" id="elementTP${semestre.numero}${moduleIndex}" min="0" value="0">
+                  </div>
+                </div>
+                
+                <div id="elementFormError${semestre.numero}${moduleIndex}" class="error-message"></div>
+                
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary cancel-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">Annuler</button>
+                  <button type="button" class="btn btn-primary save-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">Ajouter</button>
                 </div>
               </div>
-              
-              <div id="elementFormError${semestre.numero}${moduleIndex}" class="error-message"></div>
-              
-              <div class="form-actions">
-                <button type="button" class="btn btn-secondary cancel-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">Annuler</button>
-                <button type="button" class="btn btn-primary save-element-btn" data-semestre="${semestre.numero}" data-module="${moduleIndex}">Ajouter</button>
-              </div>
             </div>
-          </div>
-        `;
+          `;
+        });
       });
     });
     
@@ -1026,54 +1103,71 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
     
-    let semestresHtml = '';
-    
+    // Organiser les semestres par année
+    const semestresByAnnee = {};
     data.semestres.forEach(semestre => {
-      let modulesHtml = '';
-      
-      if (semestre.modules && semestre.modules.length > 0) {
-        semestre.modules.forEach(module => {
-          let elementsHtml = '';
-          
-          if (module.elements && module.elements.length > 0) {
-            elementsHtml = `
-              <ul class="elements-list">
-                ${module.elements.map(element => `
-                  <li>
-                    <strong>${escapeHtml(element.nom)}</strong>
-                    <div class="horaires-inline">
-                      <span>Cours: ${element.heuresCours || 0}h</span>
-                      <span>TD: ${element.heuresTD || 0}h</span>
-                      <span>TP: ${element.heuresTP || 0}h</span>
-                    </div>
-                  </li>
-                `).join('')}
-              </ul>
-            `;
-          }
-          
-          modulesHtml += `
-            <li>
-              <strong>${escapeHtml(module.nom)}</strong>
-              <div class="horaires-inline">
-                <span>Cours: ${module.heuresCours || 0}h</span>
-                <span>TD: ${module.heuresTD || 0}h</span>
-                <span>TP: ${module.heuresTP || 0}h</span>
-              </div>
-              ${elementsHtml}
-            </li>
-          `;
-        });
+      if (!semestresByAnnee[semestre.annee]) {
+        semestresByAnnee[semestre.annee] = [];
       }
+      semestresByAnnee[semestre.annee].push(semestre);
+    });
+    
+    let structureHtml = '';
+    
+    // Générer l'HTML par année et semestre
+    Object.keys(semestresByAnnee).sort().forEach(annee => {
+      structureHtml += `<h4>Année ${annee}</h4>`;
       
-      semestresHtml += `
-        <div class="summary-semestre">
-          <h4>Semestre ${semestre.numero}</h4>
-          <ul class="modules-list">
+      // Générer les semestres de cette année
+      semestresByAnnee[annee].sort((a, b) => a.numero - b.numero).forEach(semestre => {
+        let modulesHtml = '';
+        
+        if (semestre.modules && semestre.modules.length > 0) {
+          modulesHtml = `
+            <ul class="modules-list">
+              ${semestre.modules.map(module => {
+                let elementsHtml = '';
+                
+                if (module.elements && module.elements.length > 0) {
+                  elementsHtml = `
+                    <ul class="elements-list">
+                      ${module.elements.map(element => `
+                        <li>
+                          <strong>${escapeHtml(element.nom)}</strong>
+                          <div class="horaires-inline">
+                            <span>Cours: ${element.heuresCours || 0}h</span>
+                            <span>TD: ${element.heuresTD || 0}h</span>
+                            <span>TP: ${element.heuresTP || 0}h</span>
+                          </div>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  `;
+                }
+                
+                return `
+                  <li>
+                    <strong>${escapeHtml(module.nom)}</strong>
+                    <div class="horaires-inline">
+                      <span>Cours: ${module.heuresCours || 0}h</span>
+                      <span>TD: ${module.heuresTD || 0}h</span>
+                      <span>TP: ${module.heuresTP || 0}h</span>
+                    </div>
+                    ${elementsHtml}
+                  </li>
+                `;
+              }).join('')}
+            </ul>
+          `;
+        }
+        
+        structureHtml += `
+          <div class="summary-semestre">
+            <h5>Semestre ${semestre.numero}</h5>
             ${modulesHtml}
-          </ul>
-        </div>
-      `;
+          </div>
+        `;
+      });
     });
     
     return `
@@ -1083,12 +1177,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="summary-info">
             <p><strong>Nom:</strong> ${escapeHtml(data.basicInfo.nom)}</p>
             <p><strong>Description:</strong> ${escapeHtml(data.basicInfo.description)}</p>
+            <p><strong>Nombre d'années:</strong> ${data.basicInfo.nombreAnnees || 2}</p>
           </div>
         </div>
         
         <div class="summary-section">
           <h3>Structure académique</h3>
           <div class="summary-stats">
+            <div class="summary-stat">
+              <div class="stat-value">${data.basicInfo.nombreAnnees || 2}</div>
+              <div class="stat-label">Années</div>
+            </div>
             <div class="summary-stat">
               <div class="stat-value">${data.semestres.length}</div>
               <div class="stat-label">Semestres</div>
@@ -1105,8 +1204,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         
         <div class="summary-section">
-          <h3>Détails des semestres</h3>
-          ${semestresHtml}
+          <h3>Détails de la structure</h3>
+          ${structureHtml}
         </div>
       </div>
     `;
@@ -1124,90 +1223,256 @@ document.addEventListener('DOMContentLoaded', () => {
       // Récupérer les modules de la filière
       const modules = await moduleService.getModulesByFiliere(id);
       
-      // Organiser les modules par semestre
-      const semestres = {};
+      // Organiser les modules par année et semestre
+      const annees = {};
       
       modules.forEach(module => {
-        if (!semestres[module.semestre]) {
-          semestres[module.semestre] = [];
+        // Déterminer l'année basée sur le semestre (semestres 1-2 = année 1, semestres 3-4 = année 2)
+        const annee = Math.ceil(module.semestre / 2);
+        
+        if (!annees[annee]) {
+          annees[annee] = {
+            1: [], // Semestre impair (1 ou 3)
+            2: []  // Semestre pair (2 ou 4)
+          };
         }
         
-        semestres[module.semestre].push(module);
+        // Ajuster le numéro du semestre pour l'affichage (1-2 pour chaque année)
+        const semestreDisplay = module.semestre % 2 === 0 ? 2 : 1;
+        annees[annee][semestreDisplay].push(module);
       });
       
-      let semestresHtml = '';
+      let anneesHtml = '';
       
-      // Générer l'HTML pour chaque semestre
-      for (const [semestre, modulesList] of Object.entries(semestres)) {
-        let modulesHtml = '';
+      // Générer l'HTML pour chaque année et ses semestres
+      for (const [annee, semestres] of Object.entries(annees)) {
+        anneesHtml += `
+          <div class="annee-section">
+            <h3 class="annee-title">Année ${annee}</h3>
+            <div class="semestres-row">
+        `;
         
-        for (const module of modulesList) {
-          // Récupérer les éléments du module
-          const elements = await elementService.getElementsByModule(module.id);
+        // Générer l'HTML pour chaque semestre
+        for (let semestreNum = 1; semestreNum <= 2; semestreNum++) {
+          const semestreModules = semestres[semestreNum] || [];
+          const semestreReel = (parseInt(annee) - 1) * 2 + semestreNum;
           
-          let elementsHtml = '';
+          anneesHtml += `
+            <div class="semestre-column">
+              <h4 class="semestre-title">Semestre ${semestreReel}</h4>
+              <div class="modules-list">
+          `;
           
-          if (elements.length > 0) {
-            elementsHtml = `
-              <h5>Éléments</h5>
-              <ul class="elements-list">
-                ${elements.map(element => `
-                  <li>
-                    <div class="element-header">
-                      <strong>${escapeHtml(element.nom)}</strong>
-                    </div>
-                    <p>${escapeHtml(element.description)}</p>
-                    <div class="horaires-container">
-                      <span>Cours: ${element.heuresCours || 0}h</span>
-                      <span>TD: ${element.heuresTD || 0}h</span>
-                      <span>TP: ${element.heuresTP || 0}h</span>
-                    </div>
-                  </li>
-                `).join('')}
-              </ul>
-            `;
+          if (semestreModules.length === 0) {
+            anneesHtml += `<p class="no-modules">Aucun module pour ce semestre</p>`;
+          } else {
+            for (const module of semestreModules) {
+              // Récupérer les éléments du module
+              const elements = await elementService.getElementsByModule(module.id);
+              
+              let elementsHtml = '';
+              if (elements.length > 0) {
+                elementsHtml = `
+                  <div class="elements-container">
+                    <h5>Éléments du module</h5>
+                    <ul class="elements-list">
+                      ${elements.map(element => `
+                        <li class="element-item">
+                          <div class="element-name">${escapeHtml(element.nom)}</div>
+                          <div class="element-hours">
+                            <span>CM: ${element.heuresCours}h</span>
+                            <span>TD: ${element.heuresTD}h</span>
+                            <span>TP: ${element.heuresTP}h</span>
+                          </div>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                `;
+              }
+              
+              anneesHtml += `
+                <div class="module-card">
+                  <div class="module-header">
+                    <h5 class="module-title">${escapeHtml(module.nom)}</h5>
+                    ${module.professeurNom ? `<div class="professor-badge">${escapeHtml(module.professeurNom)}</div>` : ''}
+                  </div>
+                  <p class="module-description">${escapeHtml(module.description)}</p>
+                  <div class="module-hours">
+                    <span>CM: ${module.heuresCours}h</span>
+                    <span>TD: ${module.heuresTD}h</span>
+                    <span>TP: ${module.heuresTP}h</span>
+                  </div>
+                  ${elementsHtml}
+                </div>
+              `;
+            }
           }
           
-          modulesHtml += `
-            <div class="detail-module-card">
-              <div class="module-header">
-                <h4>${escapeHtml(module.nom)}</h4>
-                ${module.professeurNom ? `<div class="professor-tag">Prof: ${escapeHtml(module.professeurNom)}</div>` : ''}
+          anneesHtml += `
+                </div>
               </div>
-              <p>${escapeHtml(module.description)}</p>
-              <div class="horaires-container">
-                <span>Cours: ${module.heuresCours || 0}h</span>
-                <span>TD: ${module.heuresTD || 0}h</span>
-                <span>TP: ${module.heuresTP || 0}h</span>
-              </div>
-              ${elementsHtml}
-            </div>
           `;
         }
         
-        semestresHtml += `
-          <div class="detail-semestre">
-            <h3>Semestre ${semestre}</h3>
-            <div class="detail-modules">
-              ${modulesHtml || '<p>Aucun module pour ce semestre.</p>'}
+        anneesHtml += `
+              </div>
             </div>
-          </div>
         `;
       }
       
+      // CSS à ajouter pour l'affichage
+      const detailsStyles = `
+        <style>
+          .filiere-detail-container {
+            margin-bottom: 2rem;
+          }
+          .filiere-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+          }
+          .filiere-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+          }
+          .filiere-meta-item {
+            text-align: center;
+          }
+          .meta-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-primary);
+          }
+          .meta-label {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+          }
+          .annee-section {
+            margin-bottom: 2rem;
+          }
+          .annee-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--color-primary);
+            color: white;
+            border-radius: var(--radius-md);
+          }
+          .semestres-row {
+            display: flex;
+            gap: 1.5rem;
+          }
+          .semestre-column {
+            flex: 1;
+            background-color: var(--color-bg-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+          }
+          .semestre-title {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+          }
+          .module-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+          }
+          .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+          }
+          .module-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+          }
+          .professor-badge {
+            font-size: 0.75rem;
+            background-color: var(--color-professor);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+          }
+          .module-description {
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+          }
+          .module-hours {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+          }
+          .elements-container {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--color-border);
+          }
+          .elements-list {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0 0;
+          }
+          .element-item {
+            padding: 0.5rem;
+            background-color: var(--color-bg-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+          }
+          .element-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+          }
+          .element-hours {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.75rem;
+          }
+          .no-modules {
+            font-style: italic;
+            color: var(--color-text-light);
+            padding: 1rem;
+            text-align: center;
+          }
+        </style>
+      `;
+      
       const content = `
-        <div class="filiere-detail">
-          <div class="filiere-detail-header">
+        ${detailsStyles}
+        <div class="filiere-detail-container">
+          <div class="filiere-header">
             <h2>${escapeHtml(filiere.nom)}</h2>
-            <div class="filiere-stats">
-              <div class="stat">
-                <div class="stat-value">${filiere.nombreEtudiants}</div>
-                <div class="stat-label">Étudiants</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">${filiere.nombreModules}</div>
-                <div class="stat-label">Modules</div>
-              </div>
+            <div class="filiere-actions">
+              <button class="btn btn-sm btn-primary edit-filiere-btn" data-id="${filiere.id}">
+                <i class="fas fa-edit"></i> Modifier
+              </button>
+            </div>
+          </div>
+          
+          <div class="filiere-meta">
+            <div class="filiere-meta-item">
+              <div class="meta-value">${filiere.nombreEtudiants}</div>
+              <div class="meta-label">Étudiants</div>
+            </div>
+            <div class="filiere-meta-item">
+              <div class="meta-value">${filiere.nombreModules}</div>
+              <div class="meta-label">Modules</div>
+            </div>
+            <div class="filiere-meta-item">
+              <div class="meta-value">${filiere.nombreAnnees || Object.keys(annees).length || 2}</div>
+              <div class="meta-label">Années</div>
             </div>
           </div>
           
@@ -1216,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           
           <div class="filiere-structure">
-            ${semestresHtml || '<p>Aucun module trouvé pour cette filière.</p>'}
+            ${anneesHtml || '<p class="no-data">Aucune donnée disponible pour cette filière.</p>'}
           </div>
         </div>
       `;
@@ -1228,6 +1493,12 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       
       document.getElementById('closeBtn').addEventListener('click', () => modal.close());
+      
+      // Ajouter l'event listener pour le bouton d'édition
+      document.querySelector('.edit-filiere-btn')?.addEventListener('click', () => {
+        modal.close();
+        editFiliere(filiere.id);
+      });
       
     } catch (error) {
       showError('Erreur lors de la récupération des détails de la filière');
@@ -1248,10 +1519,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const modules = await moduleService.getModulesByFiliere(id);
       
       // Organiser les modules par semestre et récupérer leurs éléments
-      const semestres = [
-        { numero: 1, modules: [] },
-        { numero: 2, modules: [] }
-      ];
+      const semestres = [];
+      const nombreAnnees = filiere.nombreAnnees || 2;
+      
+      // Créer la structure de base des semestres
+      for (let annee = 1; annee <= nombreAnnees; annee++) {
+        semestres.push(
+          { numero: (annee - 1) * 2 + 1, annee: annee, modules: [] },
+          { numero: (annee - 1) * 2 + 2, annee: annee, modules: [] }
+        );
+      }
       
       // Regrouper les modules par semestre
       for (const module of modules) {
@@ -1274,7 +1551,8 @@ document.addEventListener('DOMContentLoaded', () => {
         basicInfo: {
           id: filiere.id,
           nom: filiere.nom,
-          description: filiere.description
+          description: filiere.description,
+          nombreAnnees: filiere.nombreAnnees || 2
         },
         semestres
       };

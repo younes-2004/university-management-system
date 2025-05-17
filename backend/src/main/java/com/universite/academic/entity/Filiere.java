@@ -35,6 +35,9 @@ public class Filiere {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+    private Integer nombreAnnees = 2; // Par défaut 2 années d'études
+
     // Relation avec les modules
     @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude  // Pour éviter les problèmes de récursion avec toString()

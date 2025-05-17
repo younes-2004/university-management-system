@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,6 +20,8 @@ public class FiliereDto {
     @NotBlank(message = "La description de la filière ne peut pas être vide")
     @Size(max = 500, message = "La description de la filière ne peut pas dépasser 500 caractères")
     private String description;
+
+    private Integer nombreAnnees = 2;
 
     private int nombreEtudiants;
     private int nombreModules;

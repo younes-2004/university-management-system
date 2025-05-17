@@ -37,6 +37,11 @@ public class FiliereController {
     @PostMapping("/admin/filieres")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FiliereDto> createFiliere(@Valid @RequestBody FiliereDto filiereDto) {
+        // Validation explicite
+        if (filiereDto.getNombreAnnees() == null) {
+            filiereDto.setNombreAnnees(2); // Valeur par défaut
+        }
+
         FiliereDto createdFiliere = filiereService.createFiliere(filiereDto);
         return new ResponseEntity<>(createdFiliere, HttpStatus.CREATED);
     }

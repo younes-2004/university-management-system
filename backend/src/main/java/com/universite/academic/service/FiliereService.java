@@ -1,4 +1,5 @@
 package com.universite.academic.service;
+
 import com.universite.academic.entity.Module;
 import com.universite.academic.dto.FiliereDto;
 import com.universite.academic.entity.Filiere;
@@ -12,10 +13,10 @@ import com.universite.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class FiliereService {
     public List<FiliereDto> getAllFilieres() {
         return filiereRepository.findAll().stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +53,11 @@ public class FiliereService {
             throw new BadRequestException("La description de la filière ne peut pas être vide");
         }
 
+        // Vérification que nombreAnnees n'est pas null
+        if (filiereDto.getNombreAnnees() == null) {
+            filiereDto.setNombreAnnees(2); // Valeur par défaut
+        }
+
         if (filiereRepository.existsByNom(filiereDto.getNom())) {
             throw new BadRequestException("Une filière avec ce nom existe déjà");
         }
@@ -59,6 +65,7 @@ public class FiliereService {
         Filiere filiere = Filiere.builder()
                 .nom(filiereDto.getNom().trim())  // Trim pour éviter les espaces avant/après
                 .description(filiereDto.getDescription().trim())
+                .nombreAnnees(filiereDto.getNombreAnnees())
                 .build();
 
         Filiere savedFiliere = filiereRepository.save(filiere);
@@ -86,8 +93,14 @@ public class FiliereService {
             throw new BadRequestException("Une filière avec ce nom existe déjà");
         }
 
+        // Mise à jour des champs
         filiere.setNom(filiereDto.getNom().trim());
         filiere.setDescription(filiereDto.getDescription().trim());
+
+        // Mise à jour du nombre d'années si valeur fournie
+        if (filiereDto.getNombreAnnees() != null) {
+            filiere.setNombreAnnees(filiereDto.getNombreAnnees());
+        }
 
         Filiere updatedFiliere = filiereRepository.save(filiere);
         return mapToDto(updatedFiliere);
@@ -95,7 +108,6 @@ public class FiliereService {
 
     @Transactional
     public void deleteFiliere(Long id) {
-        // Le reste du code est inchangé...
         Filiere filiere = filiereRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(FILIERE_NOT_FOUND + id));
 
@@ -116,8 +128,6 @@ public class FiliereService {
         filiereRepository.delete(filiere);
     }
 
-    // Le reste des méthodes est inchangé...
-
     @Transactional(readOnly = true)
     public List<FiliereDto> getFilieresByProfesseur(Long professeurId) {
         User professeur = userRepository.findById(professeurId)
@@ -135,7 +145,7 @@ public class FiliereService {
                 .map(Module::getFiliere)
                 .distinct()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private FiliereDto mapToDto(Filiere filiere) {
@@ -153,6 +163,7 @@ public class FiliereService {
                 .id(filiere.getId())
                 .nom(filiere.getNom())
                 .description(filiere.getDescription())
+                .nombreAnnees(filiere.getNombreAnnees())
                 .nombreEtudiants((int) studentCount)
                 .nombreModules((int) moduleCount)
                 .build();

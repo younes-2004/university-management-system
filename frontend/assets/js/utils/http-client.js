@@ -48,31 +48,34 @@ class HttpClient {
     }
   }
 
-  // Méthode POST
-  async post(endpoint, data) {
-    try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(data)
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/index.html';
-          return null;
-        }
-        throw new Error(`Erreur HTTP: ${response.status}`);
+  // Méthode POST// Vérifiez dans votre httpClient.js que les erreurs sont bien capturées et remontées
+async post(endpoint, data) {
+  try {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      // Amélioration: essayer de récupérer le message d'erreur du serveur
+      let errorMessage;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || `Erreur HTTP: ${response.status}`;
+      } catch (e) {
+        errorMessage = `Erreur HTTP: ${response.status}`;
       }
       
-      return await response.json();
-    } catch (error) {
-      console.error('Erreur POST:', error);
-      throw error;
+      throw new Error(errorMessage);
     }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur POST:', error);
+    throw error;
   }
+}
 
   // Méthode PUT
   async put(endpoint, data) {
