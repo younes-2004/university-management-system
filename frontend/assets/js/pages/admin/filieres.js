@@ -104,6 +104,232 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Fonction améliorée pour afficher les détails d'une filière
+  async function viewFiliere(id) {
+    try {
+      const filiere = await filiereService.getFiliereById(id);
+      if (!filiere) {
+        showError('Filière non trouvée');
+        return;
+      }
+      
+      // Récupérer les modules de la filière
+      const modules = await moduleService.getModulesByFiliere(id);
+      
+      // Organiser les modules par année et semestre
+      const annees = {};
+      
+      modules.forEach(module => {
+        // Déterminer l'année basée sur le semestre (semestres 1-2 = année 1, semestres 3-4 = année 2)
+        const annee = Math.ceil(module.semestre / 2);
+        
+        if (!annees[annee]) {
+          annees[annee] = {
+            1: [], // Semestre impair (1 ou 3)
+            2: []  // Semestre pair (2 ou 4)
+          };
+        }
+        
+        // Ajuster le numéro du semestre pour l'affichage (1-2 pour chaque année)
+        const semestreDisplay = module.semestre % 2 === 0 ? 2 : 1;
+        annees[annee][semestreDisplay].push(module);
+      });
+      
+      // Générer le HTML amélioré
+      let anneesHtml = '';
+      
+      // Cas où il n'y a pas de modules
+      if (Object.keys(annees).length === 0) {
+        anneesHtml = `
+          <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <h3>Aucun module défini</h3>
+            <p>Cette filière n'a pas encore de modules configurés.</p>
+          </div>
+        `;
+      } else {
+        // Générer l'HTML pour chaque année et ses semestres
+        for (const [annee, semestres] of Object.entries(annees)) {
+          anneesHtml += `
+            <div class="annee-section">
+              <div class="annee-header">
+                <i class="fas fa-calendar-alt"></i> Année ${annee}
+              </div>
+              <div class="semestres-grid">
+          `;
+          
+          // Générer l'HTML pour chaque semestre
+          for (let semestreNum = 1; semestreNum <= 2; semestreNum++) {
+            const semestreModules = semestres[semestreNum] || [];
+            const semestreReel = (parseInt(annee) - 1) * 2 + semestreNum;
+            
+            anneesHtml += `
+              <div class="semestre-section">
+                <div class="semestre-header">
+                  <h3 class="semestre-title">
+                    <i class="fas fa-calendar"></i> Semestre ${semestreReel}
+                  </h3>
+                </div>
+            `;
+            
+            if (semestreModules.length === 0) {
+              anneesHtml += `
+                <div class="empty-state">
+                  <i class="fas fa-book"></i>
+                  <p>Aucun module pour ce semestre</p>
+                </div>
+              `;
+            } else {
+              anneesHtml += `<div class="modules-list enhanced">`;
+              
+              for (const module of semestreModules) {
+                // Récupérer les éléments du module
+                const elements = await elementService.getElementsByModule(module.id);
+                
+                let elementsHtml = '';
+                if (elements.length > 0) {
+                  elementsHtml = `
+                    <div class="elements-list">
+                      <div class="elements-header">
+                        <i class="fas fa-puzzle-piece"></i> Éléments du module
+                      </div>
+                      ${elements.map(element => `
+                        <div class="element-item">
+                          <div class="element-name">${escapeHtml(element.nom)}</div>
+                          <div class="element-hours">
+                            <span><i class="fas fa-chalkboard-teacher"></i> CM: ${element.heuresCours || 0}h</span>
+                            <span><i class="fas fa-users"></i> TD: ${element.heuresTD || 0}h</span>
+                            <span><i class="fas fa-laptop-code"></i> TP: ${element.heuresTP || 0}h</span>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  `;
+                }
+                
+                anneesHtml += `
+                  <div class="module-item">
+                    <div class="module-header">
+                      <h4 class="module-name">${escapeHtml(module.nom)}</h4>
+                      ${module.professeurNom ? `<span class="module-professor">${escapeHtml(module.professeurNom)}</span>` : ''}
+                    </div>
+                    <div class="module-description">${escapeHtml(module.description)}</div>
+                    <div class="module-hours">
+                      <div class="hour-item">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>CM: ${module.heuresCours || 0}h</span>
+                      </div>
+                      <div class="hour-item">
+                        <i class="fas fa-users"></i>
+                        <span>TD: ${module.heuresTD || 0}h</span>
+                      </div>
+                      <div class="hour-item">
+                        <i class="fas fa-laptop-code"></i>
+                        <span>TP: ${module.heuresTP || 0}h</span>
+                      </div>
+                    </div>
+                    ${elementsHtml}
+                  </div>
+                `;
+              }
+              
+              anneesHtml += `</div>`;
+            }
+            
+            anneesHtml += `</div>`;
+          }
+          
+          anneesHtml += `
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      // Créer le contenu de la modal
+      const content = `
+        <div class="filiere-detail-header">
+          <div class="filiere-title-section">
+            <h1 class="filiere-title">${escapeHtml(filiere.nom)}</h1>
+            <div class="filiere-actions">
+              <button class="btn btn-primary edit-filiere-btn" data-id="${filiere.id}">
+                <i class="fas fa-edit"></i> Modifier
+              </button>
+            </div>
+          </div>
+          
+          <div class="filiere-description-section">
+            <p class="filiere-description">${escapeHtml(filiere.description)}</p>
+          </div>
+          
+          <div class="filiere-stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon students">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div class="stat-value">${filiere.nombreEtudiants || 0}</div>
+              <p class="stat-label">Étudiants inscrits</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon modules">
+                <i class="fas fa-book"></i>
+              </div>
+              <div class="stat-value">${filiere.nombreModules || 0}</div>
+              <p class="stat-label">Modules au total</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon years">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div class="stat-value">${filiere.nombreAnnees || Object.keys(annees).length || 2}</div>
+              <p class="stat-label">Années d'études</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filiere-content">
+          ${anneesHtml}
+        </div>
+      `;
+      
+      // Ouvrir la modal avec la classe large-modal
+      modal.open(
+        '',  // Titre vide car on a un header personnalisé
+        content,
+        `<button type="button" class="btn btn-secondary" id="closeBtn">
+           <i class="fas fa-times"></i> Fermer
+         </button>`,
+        'large-modal'  // Classe CSS personnalisée
+      );
+      
+      // Ajouter les classes CSS améliorées
+      const modalElement = document.querySelector('.modal');
+      const modalHeader = document.querySelector('.modal-header');
+      const modalBody = document.querySelector('.modal-body');
+      const modalFooter = document.querySelector('.modal-footer');
+      const modalClose = document.querySelector('.modal-close');
+      
+      if (modalElement) modalElement.classList.add('large-modal');
+      if (modalHeader) modalHeader.classList.add('enhanced');
+      if (modalBody) modalBody.classList.add('enhanced');
+      if (modalFooter) modalFooter.classList.add('enhanced');
+      if (modalClose) modalClose.classList.add('enhanced');
+      
+      // Event listeners
+      document.getElementById('closeBtn').addEventListener('click', () => modal.close());
+      
+      // Ajouter l'event listener pour le bouton d'édition
+      document.querySelector('.edit-filiere-btn')?.addEventListener('click', () => {
+        modal.close();
+        editFiliere(filiere.id);
+      });
+      
+    } catch (error) {
+      showError('Erreur lors de la récupération des détails de la filière');
+      console.error('Erreur:', error);
+    }
+  }
+
   // Fonction commune pour gérer la complétion de l'assistant
   function handleWizardComplete(data) {
   return async () => {
@@ -1209,301 +1435,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
     `;
-  }
-
-  // Fonction pour voir les détails d'une filière
-  async function viewFiliere(id) {
-    try {
-      const filiere = await filiereService.getFiliereById(id);
-      if (!filiere) {
-        showError('Filière non trouvée');
-        return;
-      }
-      
-      // Récupérer les modules de la filière
-      const modules = await moduleService.getModulesByFiliere(id);
-      
-      // Organiser les modules par année et semestre
-      const annees = {};
-      
-      modules.forEach(module => {
-        // Déterminer l'année basée sur le semestre (semestres 1-2 = année 1, semestres 3-4 = année 2)
-        const annee = Math.ceil(module.semestre / 2);
-        
-        if (!annees[annee]) {
-          annees[annee] = {
-            1: [], // Semestre impair (1 ou 3)
-            2: []  // Semestre pair (2 ou 4)
-          };
-        }
-        
-        // Ajuster le numéro du semestre pour l'affichage (1-2 pour chaque année)
-        const semestreDisplay = module.semestre % 2 === 0 ? 2 : 1;
-        annees[annee][semestreDisplay].push(module);
-      });
-      
-      let anneesHtml = '';
-      
-      // Générer l'HTML pour chaque année et ses semestres
-      for (const [annee, semestres] of Object.entries(annees)) {
-        anneesHtml += `
-          <div class="annee-section">
-            <h3 class="annee-title">Année ${annee}</h3>
-            <div class="semestres-row">
-        `;
-        
-        // Générer l'HTML pour chaque semestre
-        for (let semestreNum = 1; semestreNum <= 2; semestreNum++) {
-          const semestreModules = semestres[semestreNum] || [];
-          const semestreReel = (parseInt(annee) - 1) * 2 + semestreNum;
-          
-          anneesHtml += `
-            <div class="semestre-column">
-              <h4 class="semestre-title">Semestre ${semestreReel}</h4>
-              <div class="modules-list">
-          `;
-          
-          if (semestreModules.length === 0) {
-            anneesHtml += `<p class="no-modules">Aucun module pour ce semestre</p>`;
-          } else {
-            for (const module of semestreModules) {
-              // Récupérer les éléments du module
-              const elements = await elementService.getElementsByModule(module.id);
-              
-              let elementsHtml = '';
-              if (elements.length > 0) {
-                elementsHtml = `
-                  <div class="elements-container">
-                    <h5>Éléments du module</h5>
-                    <ul class="elements-list">
-                      ${elements.map(element => `
-                        <li class="element-item">
-                          <div class="element-name">${escapeHtml(element.nom)}</div>
-                          <div class="element-hours">
-                            <span>CM: ${element.heuresCours}h</span>
-                            <span>TD: ${element.heuresTD}h</span>
-                            <span>TP: ${element.heuresTP}h</span>
-                          </div>
-                        </li>
-                      `).join('')}
-                    </ul>
-                  </div>
-                `;
-              }
-              
-              anneesHtml += `
-                <div class="module-card">
-                  <div class="module-header">
-                    <h5 class="module-title">${escapeHtml(module.nom)}</h5>
-                    ${module.professeurNom ? `<div class="professor-badge">${escapeHtml(module.professeurNom)}</div>` : ''}
-                  </div>
-                  <p class="module-description">${escapeHtml(module.description)}</p>
-                  <div class="module-hours">
-                    <span>CM: ${module.heuresCours}h</span>
-                    <span>TD: ${module.heuresTD}h</span>
-                    <span>TP: ${module.heuresTP}h</span>
-                  </div>
-                  ${elementsHtml}
-                </div>
-              `;
-            }
-          }
-          
-          anneesHtml += `
-                </div>
-              </div>
-          `;
-        }
-        
-        anneesHtml += `
-              </div>
-            </div>
-        `;
-      }
-      
-      // CSS à ajouter pour l'affichage
-      const detailsStyles = `
-        <style>
-          .filiere-detail-container {
-            margin-bottom: 2rem;
-          }
-          .filiere-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--color-border);
-          }
-          .filiere-meta {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 1rem;
-          }
-          .filiere-meta-item {
-            text-align: center;
-          }
-          .meta-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--color-primary);
-          }
-          .meta-label {
-            font-size: 0.875rem;
-            color: var(--color-text-light);
-          }
-          .annee-section {
-            margin-bottom: 2rem;
-          }
-          .annee-title {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            padding: 0.5rem 1rem;
-            background-color: var(--color-primary);
-            color: white;
-            border-radius: var(--radius-md);
-          }
-          .semestres-row {
-            display: flex;
-            gap: 1.5rem;
-          }
-          .semestre-column {
-            flex: 1;
-            background-color: var(--color-bg-light);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-          }
-          .semestre-title {
-            font-size: 1.125rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--color-border);
-          }
-          .module-card {
-            background-color: white;
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--shadow-sm);
-          }
-          .module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-          }
-          .module-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 0;
-          }
-          .professor-badge {
-            font-size: 0.75rem;
-            background-color: var(--color-professor);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-          }
-          .module-description {
-            font-size: 0.875rem;
-            margin-bottom: 0.75rem;
-          }
-          .module-hours {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            margin-bottom: 0.5rem;
-          }
-          .elements-container {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px dashed var(--color-border);
-          }
-          .elements-list {
-            list-style: none;
-            padding: 0;
-            margin: 0.5rem 0 0;
-          }
-          .element-item {
-            padding: 0.5rem;
-            background-color: var(--color-bg-light);
-            border-radius: var(--radius-sm);
-            margin-bottom: 0.5rem;
-          }
-          .element-name {
-            font-weight: 500;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-          }
-          .element-hours {
-            display: flex;
-            gap: 0.75rem;
-            font-size: 0.75rem;
-          }
-          .no-modules {
-            font-style: italic;
-            color: var(--color-text-light);
-            padding: 1rem;
-            text-align: center;
-          }
-        </style>
-      `;
-      
-      const content = `
-        ${detailsStyles}
-        <div class="filiere-detail-container">
-          <div class="filiere-header">
-            <h2>${escapeHtml(filiere.nom)}</h2>
-            <div class="filiere-actions">
-              <button class="btn btn-sm btn-primary edit-filiere-btn" data-id="${filiere.id}">
-                <i class="fas fa-edit"></i> Modifier
-              </button>
-            </div>
-          </div>
-          
-          <div class="filiere-meta">
-            <div class="filiere-meta-item">
-              <div class="meta-value">${filiere.nombreEtudiants}</div>
-              <div class="meta-label">Étudiants</div>
-            </div>
-            <div class="filiere-meta-item">
-              <div class="meta-value">${filiere.nombreModules}</div>
-              <div class="meta-label">Modules</div>
-            </div>
-            <div class="filiere-meta-item">
-              <div class="meta-value">${filiere.nombreAnnees || Object.keys(annees).length || 2}</div>
-              <div class="meta-label">Années</div>
-            </div>
-          </div>
-          
-          <div class="filiere-description">
-            <p>${escapeHtml(filiere.description)}</p>
-          </div>
-          
-          <div class="filiere-structure">
-            ${anneesHtml || '<p class="no-data">Aucune donnée disponible pour cette filière.</p>'}
-          </div>
-        </div>
-      `;
-      
-      modal.open(
-        'Détails de la filière',
-        content,
-        '<button type="button" class="btn btn-secondary" id="closeBtn">Fermer</button>'
-      );
-      
-      document.getElementById('closeBtn').addEventListener('click', () => modal.close());
-      
-      // Ajouter l'event listener pour le bouton d'édition
-      document.querySelector('.edit-filiere-btn')?.addEventListener('click', () => {
-        modal.close();
-        editFiliere(filiere.id);
-      });
-      
-    } catch (error) {
-      showError('Erreur lors de la récupération des détails de la filière');
-      console.error('Erreur:', error);
-    }
   }
 
   // Fonction pour éditer une filière existante

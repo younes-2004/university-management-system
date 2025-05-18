@@ -297,6 +297,7 @@
   justify-content: center;
   padding: 0 5px;
 }
+
 /* Ajout à la fin du fichier frontend/assets/css/admin.css */
 
 /* Styles pour les statuts de carte dans le tableau des étudiants */
@@ -363,6 +364,7 @@
     padding: 2px 6px;
   }
 }
+
 /* Nouveau layout du tableau de bord */
 .dashboard-layout {
   display: grid;
@@ -558,4 +560,421 @@
   .side-stat-item {
     padding: var(--spacing-sm);
   }
+}
+
+/* ========================================
+   STYLES AMÉLIORÉS POUR LA MODAL DE FILIÈRE
+   ======================================== */
+
+/* Modal container amélioré */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* Modal principale - beaucoup plus grande */
+.modal.large-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 95%;
+  max-width: 1400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  animation: modal-appear 0.3s ease-out;
+}
+
+/* Header de la modal amélioré */
+.modal-header.enhanced {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header.enhanced h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.modal-close.enhanced {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.modal-close.enhanced:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Body de la modal */
+.modal-body.enhanced {
+  padding: 0;
+  max-height: calc(90vh - 160px);
+  overflow-y: auto;
+}
+
+/* Header de filière dans la modal */
+.filiere-detail-header {
+  padding: 32px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filiere-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.filiere-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.filiere-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.filiere-description-section {
+  margin-bottom: 24px;
+}
+
+.filiere-description {
+  font-size: 16px;
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin: 8px 0 0 0;
+}
+
+/* Statistiques de la filière */
+.filiere-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 24px;
+  color: white;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--color-text-light);
+  margin: 8px 0 0 0;
+  font-weight: 500;
+}
+
+/* Section du contenu principal */
+.filiere-content {
+  padding: 32px;
+}
+
+/* Années et semestres */
+.annee-section {
+  margin-bottom: 40px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+}
+
+.annee-header {
+  background: var(--color-primary);
+  color: white;
+  padding: 20px 24px;
+  font-size: 20px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.semestres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 0;
+}
+
+.semestre-section {
+  padding: 24px;
+  border-right: 1px solid var(--color-border);
+}
+
+.semestre-section:last-child {
+  border-right: none;
+}
+
+.semestre-header {
+  background: var(--color-bg-light);
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--color-primary);
+}
+
+.semestre-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* Modules dans les semestres */
+.modules-list.enhanced {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.module-item {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+.module-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary-lighter);
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.module-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.module-professor {
+  font-size: 14px;
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.module-description {
+  color: var(--color-text-light);
+  font-size: 14px;
+  margin: 8px 0 16px 0;
+  line-height: 1.5;
+}
+
+.module-hours {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hour-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-text-light);
+  background: var(--color-bg-light);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.hour-item i {
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+/* Éléments des modules */
+.elements-list {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.elements-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin-bottom: 12px;
+}
+
+.element-item {
+  background: var(--color-bg-light);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.element-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.element-hours {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-light);
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: var(--color-text);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Footer de la modal */
+.modal-footer.enhanced {
+  padding: 24px 32px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal.large-modal {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+  
+  .filiere-detail-header {
+    padding: 20px;
+  }
+  
+  .filiere-title {
+    font-size: 24px;
+  }
+  
+  .filiere-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .semestres-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .semestre-section {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .semestre-section:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Animations */
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Couleurs pour les icônes */
+.stat-icon.students {
+  background: var(--color-primary);
+}
+
+.stat-icon.modules {
+  background: var(--color-success);
+}
+
+.stat-icon.years {
+  background: var(--color-warning);
 }
