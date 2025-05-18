@@ -61,7 +61,9 @@ public class ProfessorController {
 
     @PutMapping("/professors/{professorId}/modules/{moduleId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> assignModuleToProfessor(@PathVariable Long professorId, @PathVariable Long moduleId) {
+    public ResponseEntity<ApiResponse> assignModuleToProfessor(
+            @PathVariable Long professorId,
+            @PathVariable Long moduleId) {
 
         moduleService.assignProfessorToModule(moduleId, professorId);
         return ResponseEntity.ok(new ApiResponse(true, "Module assigné au professeur avec succès"));

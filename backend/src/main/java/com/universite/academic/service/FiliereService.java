@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class FiliereService {
     public List<FiliereDto> getAllFilieres() {
         return filiereRepository.findAll().stream()
                 .map(this::mapToDto)
-                .toList();
+                .collect(Collectors.toList()); // Utilise collect au lieu de toList()
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +63,7 @@ public class FiliereService {
         }
 
         Filiere filiere = Filiere.builder()
-                .nom(filiereDto.getNom().trim())  // Trim pour éviter les espaces avant/après
+                .nom(filiereDto.getNom().trim())
                 .description(filiereDto.getDescription().trim())
                 .nombreAnnees(filiereDto.getNombreAnnees())
                 .build();
@@ -112,9 +112,7 @@ public class FiliereService {
                 .orElseThrow(() -> new ResourceNotFoundException(FILIERE_NOT_FOUND + id));
 
         // Vérifier si des étudiants sont inscrits dans cette filière
-        long studentCount = userRepository.findAll().stream()
-                .filter(u -> u.getRole() == UserRole.STUDENT && u.getFiliereId() != null && u.getFiliereId().equals(id))
-                .count();
+        long studentCount = userRepository.countByRoleAndFiliereId(UserRole.STUDENT, id);
 
         if (studentCount > 0) {
             throw new BadRequestException("Impossible de supprimer cette filière car des étudiants y sont inscrits");
@@ -140,24 +138,27 @@ public class FiliereService {
         // Obtenez les modules enseignés par ce professeur
         List<Module> modules = moduleRepository.findByProfesseur(professeur);
 
-        // Extrayez les filières uniques de ces modules
-        return modules.stream()
+        // Utiliser ConcurrentHashMap pour éviter les problèmes de concurrence
+        // et collecter les filières uniques
+        return modules.parallelStream()
                 .map(Module::getFiliere)
-                .distinct()
+                .collect(Collectors.toConcurrentMap(
+                        Filiere::getId,
+                        filiere -> filiere,
+                        (existing, replacement) -> existing,
+                        ConcurrentHashMap::new
+                ))
+                .values()
+                .stream()
                 .map(this::mapToDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
+    // Version thread-safe de mapToDto
     private FiliereDto mapToDto(Filiere filiere) {
-        // Compter le nombre d'étudiants dans cette filière
-        long studentCount = userRepository.findAll().stream()
-                .filter(u -> u.getRole() == UserRole.STUDENT &&
-                        u.getFiliereId() != null &&
-                        u.getFiliereId().equals(filiere.getId()))
-                .count();
-
-        // Compter le nombre de modules dans cette filière
-        long moduleCount = moduleRepository.findByFiliere(filiere).size();
+        // Utiliser des requêtes optimisées au lieu de findAll().stream()
+        long studentCount = userRepository.countByRoleAndFiliereId(UserRole.STUDENT, filiere.getId());
+        long moduleCount = moduleRepository.countByFiliere(filiere);
 
         return FiliereDto.builder()
                 .id(filiere.getId())

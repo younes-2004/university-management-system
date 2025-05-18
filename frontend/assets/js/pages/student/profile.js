@@ -272,43 +272,63 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('savePasswordBtn').addEventListener('click', changePassword);
   }
 
-  // Fonction pour changer le mot de passe
-  async function changePassword() {
-    const oldPassword = document.getElementById('oldPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const passwordError = document.getElementById('passwordError');
-    
-    // Validation
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      passwordError.textContent = 'Tous les champs sont obligatoires';
-      passwordError.style.display = 'block';
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      passwordError.textContent = 'Les mots de passe ne correspondent pas';
-      passwordError.style.display = 'block';
-      return;
-    }
-    
-    try {
-      const response = await httpClient.post('/auth/change-password', { oldPassword, newPassword });
-      
-      modal.close();
-      showNotification('Mot de passe changé avec succès', 'success');
-    } catch (error) {
-      console.error('Erreur lors du changement de mot de passe:', error);
-      
-      let errorMessage = 'Erreur lors du changement de mot de passe';
-      if (error.message === 'Ancien mot de passe incorrect') {
-        errorMessage = 'L\'ancien mot de passe est incorrect';
-      }
-      
-      passwordError.textContent = errorMessage;
-      passwordError.style.display = 'block';
-    }
+// Dans profile.js - Remplacer la fonction changePassword
+async function changePassword() {
+  const oldPassword = document.getElementById('oldPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const passwordError = document.getElementById('passwordError');
+  
+  console.log('=== CHANGEMENT MOT DE PASSE FRONTEND ===');
+  console.log('Ancien mot de passe fourni:', oldPassword ? '***' : 'vide');
+  console.log('Nouveau mot de passe fourni:', newPassword ? '***' : 'vide');
+  console.log('Confirmation fournie:', confirmPassword ? '***' : 'vide');
+  
+  // Validation
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    passwordError.textContent = 'Tous les champs sont obligatoires';
+    passwordError.style.display = 'block';
+    return;
   }
+  
+  if (newPassword !== confirmPassword) {
+    passwordError.textContent = 'Les mots de passe ne correspondent pas';
+    passwordError.style.display = 'block';
+    return;
+  }
+  
+  try {
+    // Préparer l'objet à envoyer
+    const changePasswordData = {
+      oldPassword: oldPassword,
+      newPassword: newPassword
+    };
+    
+    console.log('Envoi de la requête de changement de mot de passe...');
+    const response = await httpClient.post('/auth/change-password', changePasswordData);
+    
+    console.log('Changement de mot de passe réussi:', response);
+    modal.close();
+    showNotification('Mot de passe changé avec succès', 'success');
+  } catch (error) {
+    console.error('Erreur lors du changement de mot de passe:', error);
+    
+    let errorMessage = 'Erreur lors du changement de mot de passe';
+    
+    // Essayer de récupérer un message d'erreur plus spécifique
+    if (error.message) {
+      if (error.message.includes('Ancien mot de passe incorrect') || 
+          error.message.includes('incorrect')) {
+        errorMessage = 'L\'ancien mot de passe est incorrect';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    passwordError.textContent = errorMessage;
+    passwordError.style.display = 'block';
+  }
+}
 
   // Fonctions utilitaires
   function formatDate(dateString) {

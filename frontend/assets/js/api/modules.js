@@ -41,13 +41,14 @@ class ModuleService {
 
   // Récupérer les modules d'un professeur
   async getModulesByProfessor(professorId) {
-    try {
-      return await httpClient.get(`/professor/modules`);
-    } catch (error) {
-      console.error(`Erreur lors de la récupération des modules du professeur:`, error);
-      return [];
-    }
+  try {
+    // ✅ Utiliser l'endpoint admin avec l'ID du professeur
+    return await httpClient.get(`/admin/professors/${professorId}/modules`);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des modules du professeur ${professorId}:`, error);
+    return [];
   }
+}
 
   // Créer un nouveau module
   async createModule(moduleData) {

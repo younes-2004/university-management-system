@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let students = [];
   let filteredStudents = [];
   let filieres = [];
+  let cardStatuses = new Map(); // Cache pour les statuts de carte
   let currentPage = 1;
   const itemsPerPage = 10;
   let editingStudentId = null;
@@ -46,12 +47,36 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       showLoading();
       students = await studentService.getAllStudents();
+      
+      // Charger les statuts de carte pour tous les étudiants
+      await loadCardStatuses();
+      
       filteredStudents = [...students];
       pagination.update(filteredStudents.length);
       renderStudents();
     } catch (error) {
       showError('Erreur lors du chargement des étudiants');
       console.error('Erreur:', error);
+    }
+  }
+
+  // Fonction pour charger les statuts de carte
+  async function loadCardStatuses() {
+    try {
+      if (students.length === 0) return;
+      
+      const studentIds = students.map(student => student.id);
+      const statuses = await cardService.getBulkCardStatus(studentIds);
+      
+      // Créer un Map pour accès rapide
+      cardStatuses.clear();
+      if (statuses && Array.isArray(statuses)) {
+        statuses.forEach(status => {
+          cardStatuses.set(status.studentId, status);
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des statuts de carte:', error);
     }
   }
 
@@ -69,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showLoading() {
     studentsTableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="text-center">
+        <td colspan="10" class="text-center">
           <div class="loading-spinner"></div>
           Chargement des étudiants...
         </td>
@@ -109,12 +134,34 @@ document.addEventListener('DOMContentLoaded', () => {
     return filiere ? filiere.nom : 'Inconnue';
   }
 
+  // Fonction pour formater le statut de la carte
+  function formatCardStatus(studentId) {
+    const cardStatus = cardStatuses.get(studentId);
+    
+    if (!cardStatus) {
+      return '<span class="status-badge status-none">Aucune demande</span>';
+    }
+    
+    switch (cardStatus.status) {
+      case 'PENDING':
+        return '<span class="status-badge status-pending">En attente</span>';
+      case 'APPROVED':
+        return '<span class="status-badge status-approved">Approuvée</span>';
+      case 'REJECTED':
+        return '<span class="status-badge status-rejected">Rejetée</span>';
+      case 'RECEIVED':
+        return '<span class="status-badge status-received">Reçue</span>';
+      default:
+        return '<span class="status-badge status-unknown">Non Reçue</span>';
+    }
+  }
+
   // Fonction pour afficher les étudiants dans le tableau
   function renderStudents() {
     if (!filteredStudents || filteredStudents.length === 0) {
       studentsTableBody.innerHTML = `
         <tr>
-          <td colspan="9" class="text-center">Aucun étudiant trouvé.</td>
+          <td colspan="10" class="text-center">Aucun étudiant trouvé.</td>
         </tr>
       `;
       return;
@@ -135,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${student.filiereId ? escapeHtml(getFiliereName(student.filiereId)) : 'Non assignée'}</td>
         <td>${student.annee ? (student.annee === 'PREMIERE_ANNEE' ? '1ère année' : '2ème année') : ''}</td>
         <td><span class="status-badge ${getStatusClass(student.statut)}">${formatStatus(student.statut)}</span></td>
+        <td>${formatCardStatus(student.id)}</td>
         <td class="actions">
           <button class="btn-icon view-student" data-id="${student.id}" title="Voir détails">
             <i class="fas fa-eye"></i>
@@ -211,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fonction pour formater le statut
   function formatStatus(status) {
-    if (!status) return 'Inconnu';
+    if (!status) return 'Non Reçue';
     
     switch (status) {
       case 'ACTIF': return 'Actif';
@@ -243,6 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const filiereName = student.filiereId ? getFiliereName(student.filiereId) : 'Non assignée';
+      const cardStatus = cardStatuses.get(student.id);
+      let cardStatusText = 'Aucune demande';
+      
+      if (cardStatus) {
+        switch (cardStatus.status) {
+          case 'PENDING': cardStatusText = 'En attente'; break;
+          case 'APPROVED': cardStatusText = 'Approuvée'; break;
+          case 'REJECTED': cardStatusText = 'Rejetée'; break;
+          case 'RECEIVED': cardStatusText = 'Reçue'; break;
+          default: cardStatusText = 'Recue';
+        }
+      }
       
       const content = `
         <div class="student-details">
@@ -280,6 +340,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="info-group">
               <label>Statut:</label>
               <p><span class="status-badge ${getStatusClass(student.statut)}">${formatStatus(student.statut)}</span></p>
+            </div>
+
+            <div class="info-group">
+              <label>Statut de la carte:</label>
+              <p>${formatCardStatus(student.id)}</p>
             </div>
           </div>
         </div>

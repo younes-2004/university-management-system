@@ -1,5 +1,6 @@
 package com.universite.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.universite.auth.entity.enums.StudentStatus;
 import com.universite.auth.entity.enums.StudentYear;
 import com.universite.auth.entity.enums.UserRole;
@@ -47,7 +48,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserRole role;
 
-
+    @JsonProperty("nApogee")  // Annotation pour la cohérence avec le DTO
     @Column(unique = true)
     private String nApogee;
 

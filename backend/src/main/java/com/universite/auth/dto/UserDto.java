@@ -1,5 +1,6 @@
 package com.universite.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.universite.auth.entity.enums.StudentStatus;
 import com.universite.auth.entity.enums.StudentYear;
 import com.universite.auth.entity.enums.UserRole;
@@ -24,7 +25,9 @@ public class UserDto {
     private UserRole role;
 
     // Champs spécifiques aux étudiants
+    @JsonProperty("nApogee")  // Forcer Jackson à utiliser exactement ce nom pour la sérialisation/désérialisation
     private String nApogee;
+
     private StudentStatus statut;
     private StudentYear annee;
     private Long filiereId;

@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fonction pour formater le statut
   function formatStatus(status) {
-    if (!status) return 'Inconnu';
+    if (!status) return 'Non Reçue';
     
     switch (status) {
       case 'PENDING': return 'En attente';

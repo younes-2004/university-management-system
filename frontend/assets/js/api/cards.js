@@ -58,6 +58,26 @@ class CardService {
       throw error;
     }
   }
+
+  // Récupérer le statut de la carte d'un étudiant spécifique
+  async getStudentCardStatus(studentId) {
+    try {
+      return await httpClient.get(`/admin/students/${studentId}/card-status`);
+    } catch (error) {
+      console.error(`Erreur lors de la récupération du statut de carte de l'étudiant ${studentId}:`, error);
+      return null;
+    }
+  }
+
+  // Récupérer le statut des cartes pour une liste d'étudiants
+  async getBulkCardStatus(studentIds) {
+    try {
+      return await httpClient.post('/admin/card-requests/bulk-status', { studentIds });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des statuts de carte en lot:', error);
+      return [];
+    }
+  }
 }
 
 // Exporter une instance

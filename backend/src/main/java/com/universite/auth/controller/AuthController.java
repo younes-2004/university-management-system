@@ -4,6 +4,7 @@ import com.universite.auth.dto.ApiResponse;
 import com.universite.auth.dto.LoginRequest;
 import com.universite.auth.dto.LoginResponse;
 import com.universite.auth.dto.UserDto;
+import com.universite.auth.dto.ChangePasswordRequest;
 import com.universite.auth.entity.User;
 import com.universite.auth.service.AuthService;
 import com.universite.auth.service.UserService;
@@ -50,10 +51,26 @@ public class AuthController {
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse> changePassword(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword) {
+            @RequestBody ChangePasswordRequest changePasswordRequest) {
 
-        userService.changePassword(currentUser.getId(), oldPassword, newPassword);
-        return ResponseEntity.ok(new ApiResponse(true, "Mot de passe modifié avec succès"));
+        System.out.println("=== CHANGEMENT DE MOT DE PASSE ===");
+        System.out.println("Utilisateur: " + currentUser.getEmail());
+        System.out.println("Ancien mot de passe fourni: " + (changePasswordRequest.getOldPassword() != null ? "***" : "null"));
+        System.out.println("Nouveau mot de passe fourni: " + (changePasswordRequest.getNewPassword() != null ? "***" : "null"));
+
+        try {
+            userService.changePassword(
+                    currentUser.getId(),
+                    changePasswordRequest.getOldPassword(),
+                    changePasswordRequest.getNewPassword()
+            );
+
+            System.out.println("Mot de passe changé avec succès pour: " + currentUser.getEmail());
+            return ResponseEntity.ok(new ApiResponse(true, "Mot de passe modifié avec succès"));
+        } catch (Exception e) {
+            System.err.println("Erreur lors du changement de mot de passe: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

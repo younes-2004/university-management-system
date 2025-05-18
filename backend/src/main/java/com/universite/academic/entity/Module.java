@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 
 @Entity
@@ -48,6 +48,19 @@ public class Module {
     @JoinColumn(name = "professeur_id")
     private User professeur;
 
-    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Element> elements = new HashSet<>();
+    // Utilisation de ConcurrentHashMap pour éviter les ConcurrentModificationException
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Element> elements = ConcurrentHashMap.newKeySet();
+
+    // Méthodes utilitaires pour gérer la relation bidirectionnelle avec Element
+    public synchronized void addElement(Element element) {
+        elements.add(element);
+        element.setModule(this);
+    }
+
+    public synchronized void removeElement(Element element) {
+        elements.remove(element);
+        element.setModule(null);
+    }
 }

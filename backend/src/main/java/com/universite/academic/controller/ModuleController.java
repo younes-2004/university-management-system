@@ -53,6 +53,12 @@ public class ModuleController {
         List<ModuleDto> modules = moduleService.getModulesByProfesseur(currentUser.getId());
         return ResponseEntity.ok(modules);
     }
+    @GetMapping("/admin/professors/{professorId}/modules")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ModuleDto>> getProfessorModules(@PathVariable Long professorId) {
+        List<ModuleDto> modules = moduleService.getModulesByProfesseur(professorId);
+        return ResponseEntity.ok(modules);
+    }
 
     @PostMapping("/admin/modules")
     @PreAuthorize("hasRole('ADMIN')")

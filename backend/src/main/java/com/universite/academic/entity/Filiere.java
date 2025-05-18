@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 
 @Entity
@@ -38,10 +38,11 @@ public class Filiere {
     @Column(nullable = false)
     private Integer nombreAnnees = 2; // Par défaut 2 années d'études
 
-    // Relation avec les modules
-    @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Relation avec les modules - utilisation de ConcurrentHashMap pour éviter les ConcurrentModificationException
+    @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude  // Pour éviter les problèmes de récursion avec toString()
-    private Set<Module> modules = new HashSet<>();
+    @Builder.Default
+    private Set<Module> modules = ConcurrentHashMap.newKeySet();
 
     // Au lieu d'une relation OneToMany directe avec JoinColumn, utilisez une requête JPQL
     // Cela évite le mapping en double de la colonne filiere_id
@@ -49,12 +50,12 @@ public class Filiere {
     private transient java.util.List<User> etudiants;
 
     // Méthodes utilitaires pour gérer la relation bidirectionnelle avec Module
-    public void addModule(Module module) {
+    public synchronized void addModule(Module module) {
         modules.add(module);
         module.setFiliere(this);
     }
 
-    public void removeModule(Module module) {
+    public synchronized void removeModule(Module module) {
         modules.remove(module);
         module.setFiliere(null);
     }
