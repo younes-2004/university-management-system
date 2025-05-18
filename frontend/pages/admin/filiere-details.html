@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la Filière - Système Universitaire</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Système Universitaire</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                    <li class="active"><a href="filieres.html"><i class="fas fa-graduation-cap"></i> Filières</a></li>
+                    <li><a href="professors.html"><i class="fas fa-chalkboard-teacher"></i> Professeurs</a></li>
+                    <li><a href="students.html"><i class="fas fa-user-graduate"></i> Étudiants</a></li>
+                    <li><a href="cards.html"><i class="fas fa-id-card"></i> Cartes étudiantes</a></li>
+                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> Administrateurs</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button id="sidebarToggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <span id="userName">Administrateur</span>
+                    <button id="notificationsBtn" class="notifications-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notificationsBadge">0</span>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb">
+                    <a href="filieres.html"><i class="fas fa-arrow-left"></i> Retour aux filières</a>
+                </nav>
+                
+                <!-- Loading state -->
+                <div id="loadingState" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>Chargement des détails de la filière...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div id="errorState" class="error-state" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Erreur lors du chargement de la filière</p>
+                    <button id="retryBtn" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> Réessayer
+                    </button>
+                </div>
+                
+                <!-- Filière details -->
+                <div id="filiereDetails" style="display: none;">
+                    <!-- Header avec informations de base -->
+                    <div class="filiere-detail-header">
+                        <div class="filiere-title-section">
+                            <h1 class="filiere-title" id="filiereTitle">Nom de la filière</h1>
+                        </div>
+                        
+                        <div class="filiere-description-section">
+                            <p class="filiere-description" id="filiereDescription">Description de la filière</p>
+                        </div>
+                        
+                        <!-- Statistiques -->
+                        <div class="filiere-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon students">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div class="stat-value" id="studentsCount">0</div>
+                                <p class="stat-label">Étudiants inscrits</p>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon modules">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="stat-value" id="modulesCount">0</div>
+                                <p class="stat-label">Modules au total</p>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon years">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="stat-value" id="yearsCount">0</div>
+                                <p class="stat-label">Années d'études</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenu détaillé -->
+                    <div class="filiere-content" id="filiereContent">
+                        <!-- Contenu généré dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../assets/js/utils/http-client.js"></script>
+    <script src="../../assets/js/api/auth.js"></script>
+    <script src="../../assets/js/utils/auth-guard.js"></script>
+    <script src="../../assets/js/api/notifications.js"></script>
+    <script src="../../assets/js/api/filieres.js"></script>
+    <script src="../../assets/js/api/modules.js"></script>
+    <script src="../../assets/js/api/elements.js"></script>
+    <script src="../../assets/js/components/sidebar.js"></script>
+    <script src="../../assets/js/pages/admin/filiere-details.js"></script>
+</body>
+</html>

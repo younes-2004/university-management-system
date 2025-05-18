@@ -1,4 +1,7 @@
-/* Styles pour les pages administrateur */
+.filiere-actions {
+  display: flex;
+  gap: 12px;
+}/* Styles pour les pages administrateur */
 
 /* En-tête de contenu avec bouton d'action */
 .content-header {
@@ -639,20 +642,21 @@
 
 /* Header de filière dans la modal */
 .filiere-detail-header {
-  padding: 32px;
+  padding: 16px 24px; /* Réduit de 32px à 16px et 24px */
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-md); /* Réduit la marge */
 }
 
 .filiere-title-section {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-md); /* Réduit de lg à md */
 }
 
 .filiere-title {
-  font-size: 32px;
+  font-size: 24px; /* Réduit de 32px à 24px */
   font-weight: 700;
   color: var(--color-primary);
   margin: 0;
@@ -665,28 +669,28 @@
 }
 
 .filiere-description-section {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-md); /* Réduit de lg à md */
 }
 
 .filiere-description {
-  font-size: 16px;
+  font-size: 14px; /* Réduit de 16px à 14px */
   color: var(--color-text-light);
-  line-height: 1.6;
-  margin: 8px 0 0 0;
+  line-height: 1.5; /* Réduit de 1.6 à 1.5 */
+  margin: 0;
 }
 
 /* Statistiques de la filière */
 .filiere-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  gap: var(--spacing-sm); /* Réduit de md à sm */
 }
 
 .stat-card {
   background: white;
   border: 2px solid var(--color-border);
   border-radius: 12px;
-  padding: 24px;
+  padding: var(--spacing-md); /* Réduit de lg à md */
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -697,39 +701,39 @@
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
+  width: 50px; /* Réduit de 60px à 50px */
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 24px;
+  margin: 0 auto var(--spacing-sm); /* Réduit la marge */
+  font-size: 20px; /* Réduit de 24px à 20px */
   color: white;
 }
 
 .stat-value {
-  font-size: 36px;
+  font-size: 28px; /* Réduit de 36px à 28px */
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
   color: var(--color-text-light);
-  margin: 8px 0 0 0;
+  margin: 6px 0 0 0; /* Réduit de 8px à 6px */
   font-weight: 500;
 }
 
 /* Section du contenu principal */
 .filiere-content {
-  padding: 32px;
+  padding: 24px; /* Réduit de 32px à 24px */
 }
 
 /* Années et semestres */
 .annee-section {
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-lg); /* Réduit de xl à lg */
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -740,8 +744,8 @@
 .annee-header {
   background: var(--color-primary);
   color: white;
-  padding: 20px 24px;
-  font-size: 20px;
+  padding: var(--spacing-md) var(--spacing-lg); /* Réduit le padding */
+  font-size: 18px; /* Réduit de 20px à 18px */
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -753,7 +757,7 @@
 }
 
 .semestre-section {
-  padding: 24px;
+  padding: var(--spacing-md); /* Réduit de lg à md */
   border-right: 1px solid var(--color-border);
 }
 
@@ -763,14 +767,14 @@
 
 .semestre-header {
   background: var(--color-bg-light);
-  padding: 16px 20px;
+  padding: var(--spacing-sm) var(--spacing-md); /* Réduit le padding */
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-md); /* Réduit de lg à md */
   border-left: 4px solid var(--color-primary);
 }
 
 .semestre-title {
-  font-size: 18px;
+  font-size: 16px; /* Réduit de 18px à 16px */
   font-weight: 600;
   color: var(--color-text);
   margin: 0;
@@ -780,16 +784,17 @@
 .modules-list.enhanced {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-sm); /* Réduit de md à sm */
 }
 
 .module-item {
   background: white;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  padding: 20px;
+  padding: var(--spacing-md); /* Réduit de lg à md */
   transition: box-shadow 0.2s, border-color 0.2s;
   position: relative;
+  margin-bottom: var(--spacing-sm); /* Réduit l'espacement */
 }
 
 .module-item:hover {
@@ -801,11 +806,11 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-sm); /* Réduit de lg à sm */
 }
 
 .module-name {
-  font-size: 18px;
+  font-size: 16px; /* Réduit de 18px à 16px */
   font-weight: 600;
   color: var(--color-text);
   margin: 0;
@@ -813,7 +818,7 @@
 }
 
 .module-professor {
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
   color: var(--color-primary);
   background: var(--color-primary-lighter);
   padding: 4px 8px;
@@ -823,14 +828,14 @@
 
 .module-description {
   color: var(--color-text-light);
-  font-size: 14px;
-  margin: 8px 0 16px 0;
-  line-height: 1.5;
+  font-size: 13px; /* Réduit de 14px à 13px */
+  margin: 6px 0 var(--spacing-sm) 0; /* Réduit les marges */
+  line-height: 1.4; /* Réduit de 1.5 à 1.4 */
 }
 
 .module-hours {
   display: flex;
-  gap: 16px;
+  gap: var(--spacing-sm); /* Réduit de md à sm */
   flex-wrap: wrap;
 }
 
@@ -838,10 +843,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
   color: var(--color-text-light);
   background: var(--color-bg-light);
-  padding: 6px 12px;
+  padding: 4px 8px; /* Réduit le padding */
   border-radius: 6px;
 }
 
@@ -852,66 +857,66 @@
 
 /* Éléments des modules */
 .elements-list {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: var(--spacing-sm); /* Réduit de md à sm */
+  padding-top: var(--spacing-sm); /* Réduit de md à sm */
   border-top: 1px dashed var(--color-border);
 }
 
 .elements-header {
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
   font-weight: 600;
   color: var(--color-text-light);
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-sm); /* Réduit de lg à sm */
 }
 
 .element-item {
   background: var(--color-bg-light);
   border-radius: 6px;
-  padding: 12px 16px;
-  margin-bottom: 8px;
+  padding: var(--spacing-sm) var(--spacing-md); /* Réduit le padding */
+  margin-bottom: 6px; /* Réduit de 8px à 6px */
 }
 
 .element-name {
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
   font-weight: 500;
   color: var(--color-text);
-  margin-bottom: 6px;
+  margin-bottom: 4px; /* Réduit de 6px à 4px */
 }
 
 .element-hours {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
+  gap: var(--spacing-sm); /* Réduit de md à sm */
+  font-size: 11px; /* Réduit de 12px à 11px */
   color: var(--color-text-light);
 }
 
 /* État vide */
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: var(--spacing-lg) var(--spacing-md); /* Réduit le padding */
   color: var(--color-text-light);
 }
 
 .empty-state i {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 40px; /* Réduit de 48px à 40px */
+  margin-bottom: var(--spacing-sm); /* Réduit la marge */
   opacity: 0.5;
 }
 
 .empty-state h3 {
-  margin-bottom: 8px;
-  font-size: 18px;
+  margin-bottom: 6px; /* Réduit de 8px à 6px */
+  font-size: 16px; /* Réduit de 18px à 16px */
   color: var(--color-text);
 }
 
 .empty-state p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px; /* Réduit de 14px à 13px */
 }
 
 /* Footer de la modal */
 .modal-footer.enhanced {
-  padding: 24px 32px;
+  padding: var(--spacing-md) var(--spacing-lg); /* Réduit le padding */
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-light);
   display: flex;
@@ -929,11 +934,11 @@
   }
   
   .filiere-detail-header {
-    padding: 20px;
+    padding: var(--spacing-sm) var(--spacing-md); /* Réduit encore plus */
   }
   
   .filiere-title {
-    font-size: 24px;
+    font-size: 20px; /* Réduit de 24px à 20px */
   }
   
   .filiere-stats-grid {
@@ -951,6 +956,20 @@
   
   .semestre-section:last-child {
     border-bottom: none;
+  }
+  
+  .stat-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
   }
 }
 
@@ -977,4 +996,94 @@
 
 .stat-icon.years {
   background: var(--color-warning);
+}
+
+/* ========================================
+   STYLES POUR LA PAGE DE DÉTAILS DE FILIÈRE
+   ======================================== */
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+  margin-bottom: var(--spacing-lg);
+}
+
+.breadcrumb a {
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s;
+}
+
+.breadcrumb a:hover {
+  background-color: var(--color-bg-light);
+}
+
+.breadcrumb a i {
+  margin-right: var(--spacing-sm);
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.loading-container .loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.error-state i {
+  font-size: 48px;
+  color: var(--color-error);
+  margin-bottom: var(--spacing-md);
+}
+
+.error-state p {
+  color: var(--color-error);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Actions Footer pour la page de détails */
+.filiere-actions-footer {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--spacing-md);
+}
+
+/* Responsive pour la page de détails */
+@media (max-width: 768px) {
+  .filiere-actions-footer {
+    flex-direction: column;
+  }
+  
+  .filiere-actions-footer .btn {
+    width: 100%;
+  }
 }

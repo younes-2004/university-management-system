@@ -390,3 +390,240 @@
         gap: var(--spacing-sm);
     }
 }
+/* Styles spécifiques pour le profil professeur */
+
+/* Profil du professeur */
+.profile-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--color-professor);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.profile-details {
+    margin-top: var(--spacing-lg);
+}
+
+.detail-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.detail-section h3 {
+    font-size: 18px;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-sm);
+}
+
+.detail-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Statut professeur */
+.status-actif {
+    color: var(--color-success);
+}
+
+/* Sections d'enseignement */
+.teaching-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.teaching-section:last-child {
+    border-bottom: none;
+}
+
+.teaching-section h4 {
+    color: var(--color-professor);
+    margin-bottom: var(--spacing-sm);
+    font-size: 20px;
+}
+
+.teaching-section .text-muted {
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+    font-style: italic;
+}
+
+/* Grille de modules dans le profil */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.module-card {
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.module-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.module-header {
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-light);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.semestre-badge {
+    background-color: var(--color-professor);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.module-body {
+    padding: var(--spacing-md);
+}
+
+.module-body p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-light);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.module-hours {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.module-hours span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-text-light);
+    background-color: var(--color-bg-light);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.module-hours i {
+    color: var(--color-professor);
+}
+
+/* États vides et d'erreur pour le profil */
+.empty-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    text-align: center;
+    background-color: var(--color-bg-light);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+.empty-state i,
+.error-state i {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.empty-state i {
+    color: var(--color-text-light);
+}
+
+.error-state i {
+    color: var(--color-error);
+}
+
+.error-state p {
+    color: var(--color-error);
+    margin: 0;
+}
+
+/* Responsive pour le profil professeur */
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile-actions {
+        margin-top: var(--spacing-md);
+    }
+    
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .module-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: flex-start;
+    }
+    
+    .module-hours {
+        flex-direction: column;
+    }
+}
